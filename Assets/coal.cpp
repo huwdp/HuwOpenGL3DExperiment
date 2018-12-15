@@ -7,7 +7,7 @@ Coal::Coal(float x, float y, float z) : Drawable(x, y, z)
 
 void Coal::draw()
 {
-    glBegin(GL_POLYGON);
+    /*glBegin(GL_POLYGON);
 
     glColor3b(1.0, 1.0, 1.0);
     glVertex3f( -0.5, -0.5, -0.5);       // P1
@@ -15,5 +15,5 @@ void Coal::draw()
     glVertex3f(  0.5,  0.5, -0.5);       // P3
     glVertex3f(  0.5, -0.5, -0.5);       // P4
 
-    glEnd();
+    glEnd();*/
 }

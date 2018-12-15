@@ -28,3 +28,8 @@ HEADERS += \
     GameEngine/human.h \
     Assets/drawable.h \
     GameEngine/coord.h
+
+DISTFILES += \
+    main.txt \
+    main2.txt \
+    main4.txt

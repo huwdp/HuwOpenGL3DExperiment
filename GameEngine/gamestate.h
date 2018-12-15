@@ -23,6 +23,8 @@ private:
 
     std::shared_ptr<Player> player;
 
+
+
 public:
     GameState();
     std::vector<std::shared_ptr<Drawable>> getDrawables();

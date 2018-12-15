@@ -4,13 +4,15 @@
 #include <memory>
 #include <iostream>
 
-#include "gamestate.h"
-#include "Assets/tree.h"
-#include <GL/glew.h>
-
-// SDL2 Headers
-#include <SDL2/SDL.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <math.h>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+
+#include "gamestate.h"
 
 class GameEngine
 {
@@ -27,6 +29,15 @@ private:
     void checkSDLError(int line = -1);
     void printSDLGLAttributes();
     bool setOpenGLAttributes();
+
+
+
+    SDL_GLContext ctx;
+    SDL_Window* window;
+
+
+    bool loop;
+
 public:
     GameEngine();
     bool init();

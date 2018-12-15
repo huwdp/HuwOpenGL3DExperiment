@@ -3,140 +3,141 @@
 GameEngine::GameEngine()
 {
     gameState = std::make_shared<GameState>();
+    loop = true;
 }
 
 bool GameEngine::init()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    //Initialize SDL
+    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
     {
-        std::cout << "Failed to init SDL\n";
+        printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+        return 1;
+    }
+
+    //Create window
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    window = SDL_CreateWindow("SDL AR Example",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL);
+
+    if(window == NULL)
+    {
+        printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
         return false;
     }
 
-    mainWindow = SDL_CreateWindow(programName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        getWidth(), getHeight(), SDL_WINDOW_OPENGL);
-
-    if (!mainWindow)
-    {
-        std::cout << "Unable to create window\n";
-        checkSDLError(__LINE__);
-        return false;
-    }
-
-    mainContext = SDL_GL_CreateContext(mainWindow);
-
-    setOpenGLAttributes();
-    printSDLGLAttributes();
-
+    //creating new context
+    ctx = SDL_GL_CreateContext(window);
     SDL_GL_SetSwapInterval(1);
 
 
-
-    glClearColor(0, 0, 0, 0);
-    glViewport(0, 0, width, height);
-    glShadeModel(GL_SMOOTH);
+    /* Set rendering settings */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, getWidth(), getHeight(), 0, 1, -1);
-
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
-    //glEnable(GL_CULL_FACE);
-
-    gluPerspective(toRadians(getFOV()), aspectRatio(getWidth(), getHeight()), 0, getViewDistance());
-
+    glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
     glMatrixMode(GL_MODELVIEW);
-    glEnable(GL_TEXTURE_2D);
     glLoadIdentity();
-    gameState->addDrawable(std::move(std::make_shared<Tree>(0, 0, 1)));
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glShadeModel(GL_SMOOTH);
     return true;
 }
 
 void GameEngine::draw()
-{
+{   
+    static float cube[8][3] = {
+        {0.5, 0.5, -0.5},
+        {0.5, -0.5, -0.5},
+        {-0.5, -0.5, -0.5},
+        {-0.5, 0.5, -0.5},
+        {-0.5, 0.5, 0.5},
+        {0.5, 0.5, 0.5},
+        {0.5, -0.5, 0.5},
+        {-0.5, -0.5, 0.5}
+    };
+
+    /* Do our drawing, too. */
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
 
     glBegin(GL_QUADS);
-        glColor3f(1, 0, 0); glVertex3f(0, 0, 0);
-        glColor3f(1, 1, 0); glVertex3f(100, 0, 0);
-        glColor3f(1, 0, 1); glVertex3f(100, 100, 0);
-        glColor3f(1, 1, 1); glVertex3f(0, 100, 0);
+
+
+    glColor3f(1.0, 0.0, 0.0);
+    glVertex3fv(cube[0]);
+    glVertex3fv(cube[1]);
+    glVertex3fv(cube[2]);
+    glVertex3fv(cube[3]);
+
+    glColor3f(0.0, 1.0, 0.0);
+    glVertex3fv(cube[3]);
+    glVertex3fv(cube[4]);
+    glVertex3fv(cube[7]);
+    glVertex3fv(cube[2]);
+
+    glColor3f(0.0, 0.0, 1.0);
+    glVertex3fv(cube[0]);
+    glVertex3fv(cube[5]);
+    glVertex3fv(cube[6]);
+    glVertex3fv(cube[1]);
+
+    glColor3f(0.0, 1.0, 1.0);
+    glVertex3fv(cube[5]);
+    glVertex3fv(cube[4]);
+    glVertex3fv(cube[7]);
+    glVertex3fv(cube[6]);
+
+    glColor3f(1.0, 1.0, 0.0);
+    glVertex3fv(cube[5]);
+    glVertex3fv(cube[0]);
+    glVertex3fv(cube[3]);
+    glVertex3fv(cube[4]);
+
+    glColor3f(1.0, 0.0, 1.0);
+    glVertex3fv(cube[6]);
+    glVertex3fv(cube[1]);
+    glVertex3fv(cube[2]);
+    glVertex3fv(cube[7]);
+
+
     glEnd();
 
-    std::vector<std::shared_ptr<Drawable>> drawables = gameState->getDrawables();
-    for (std::vector<std::shared_ptr<Drawable>>::iterator it = drawables.begin(); it != drawables.end(); ++it)
-    {
-        (*it)->draw();
-    }
-
-    SDL_GL_SwapWindow(mainWindow);
+    glMatrixMode(GL_MODELVIEW);
+    //glRotatef(5.0, 1.0, 1.0, 1.0);
 }
 
 void GameEngine::run()
 {
     std::shared_ptr<Player> player = gameState->getPlayer();
 
-
-    bool loop = true;
-
     while (loop)
     {
-        glTranslatef(-player->getX(), -player->getY(), -player->getZ());
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
+        SDL_Event ev;
+        while(SDL_PollEvent( &ev ))
         {
-            if (event.type == SDL_QUIT)
+            if(( SDL_QUIT == ev.type ) || ( SDL_KEYDOWN == ev.type && SDLK_ESCAPE == ev.key.keysym.sym ))
             {
                 loop = false;
-            }
-
-            runPhysics();
-            draw();
-
-            std::shared_ptr<Player> player = gameState->getPlayer();
-
-            if (event.type == SDL_KEYDOWN)
-            {
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    loop = false;
-                    break;
-                case SDLK_w:
-                    player->setX(player->getX()+0.1f);
-                    break;
-                case SDLK_a:
-                    player->setY(player->getX()-0.1f);
-                    break;
-                case SDLK_s:
-                    player->setX(player->getX()-0.1f);
-                    break;
-                case SDLK_d:
-                    player->setY(player->getX()+0.1f);
-                    break;
-                case SDLK_r:
-                    // Cover with red and update
-                    glClearColor(1.0, 0.0, 0.0, 1.0);
-                    glClear(GL_COLOR_BUFFER_BIT);
-                    break;
-                case SDLK_KP_SPACE:
-                    player->setZ(player->getZ() + 1.0f);
-                    break;
-                default:
-                    break;
-                }
+                break;
             }
         }
+        int w, h;
+        //SDL_GL_MakeCurrent(window, ctx);
+        //SDL_GetWindowSize(window, &w, &h);
+        glViewport(0, 0, w, h);
+        draw();
+        SDL_GL_SwapWindow(window);
     }
 }
 
 void GameEngine::cleanUp()
 {
-    SDL_GL_DeleteContext(mainContext);
-    SDL_DestroyWindow(mainWindow);
+    if (ctx) {
+        /* SDL_GL_MakeCurrent(0, NULL); *//* doesn't do anything */
+        SDL_GL_DeleteContext(ctx);
+    }
+    SDL_DestroyWindow( window );
     SDL_Quit();
+    //exit(rc);
 }
 
 void GameEngine::runPhysics()
