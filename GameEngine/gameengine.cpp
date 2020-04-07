@@ -1,13 +1,25 @@
+#include <GL/glut.h> // Once you include glut.h (you don't need gl.h or glu.h)
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <functional>
+
+#include <random>
+#include <iostream>
+#include <memory>
+
 #include "gameengine.h"
 
-GameEngine::GameEngine()
-{
-    gameState = std::make_shared<GameState>();
-    loop = true;
-}
 
 bool GameEngine::init()
 {
+    loop = true;
+
+
+
+    /*
     //Initialize SDL
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
     {
@@ -30,7 +42,7 @@ bool GameEngine::init()
     SDL_GL_SetSwapInterval(1);
 
 
-    /* Set rendering settings */
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
@@ -40,10 +52,65 @@ bool GameEngine::init()
     glDepthFunc(GL_LESS);
     glShadeModel(GL_SMOOTH);
     return true;
+    */
+
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);
+
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH, GL_NICEST);
+    glEnable(GL_POINT_SMOOTH);
+    glHint(GL_POINT_SMOOTH, GL_NICEST);
+
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+
+    glEnable(GL_SMOOTH);
+    glEnable(GL_LIGHTING);
+
+    // Setup the materials for LIGHT0
+
+    // Enable the light
+    glEnable(GL_LIGHT0);
+    glEnable(GL_TEXTURE_2D);
+
+
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glShadeModel(GL_SMOOTH);
+}
+
+ void GameEngine::computePos(double deltaMove) {
+
+    x += deltaMove * lx * 0.2f;
+    z += deltaMove * lz * 0.2f;
+}
+
+void GameEngine::computeDir(double deltaAngle) {
+    angle += deltaAngle;
+    lx = sin(angle);
+    lz = -cos(angle);
+}
+
+void GameEngine::reshape(int w, int h)
+{
+    glViewport(0,0,(GLsizei) w, (GLsizei) h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(50.0,(GLfloat)w/(GLfloat)h,1.0,200.0);
+    glMatrixMode(GL_MODELVIEW);
 }
 
 void GameEngine::draw()
-{   
+{
     static float cube[8][3] = {
         {0.5, 0.5, -0.5},
         {0.5, -0.5, -0.5},
@@ -103,30 +170,43 @@ void GameEngine::draw()
 
     glMatrixMode(GL_MODELVIEW);
     //glRotatef(5.0, 1.0, 1.0, 1.0);
+    glFlush();
+    glutSwapBuffers();
+    GLenum errCode;
+    const GLubyte *errString;
+    if((errCode = glGetError()) != GL_NO_ERROR)
+    {
+       errString = gluErrorString(errCode);
+       fprintf (stderr,"OpenGL error : %s\n",errString);
+    }
+
+    glutPostRedisplay();
 }
 
-void GameEngine::run()
+void GameEngine::run(int argc, char** argv)
 {
-    std::shared_ptr<Player> player = gameState->getPlayer();
+    std::shared_ptr<Player> player = gameState.getPlayer();
 
-    while (loop)
-    {
-        SDL_Event ev;
-        while(SDL_PollEvent( &ev ))
-        {
-            if(( SDL_QUIT == ev.type ) || ( SDL_KEYDOWN == ev.type && SDLK_ESCAPE == ev.key.keysym.sym ))
-            {
-                loop = false;
-                break;
-            }
-        }
-        int w, h;
-        //SDL_GL_MakeCurrent(window, ctx);
-        //SDL_GetWindowSize(window, &w, &h);
-        glViewport(0, 0, w, h);
-        draw();
-        SDL_GL_SwapWindow(window);
-    }
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE |GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(500,500);
+    glutInitWindowPosition(100,100);
+    glutCreateWindow(argv[0]);
+    init();
+    glutDisplayFunc(draw);
+    //glutReshapeFunc(reshape, nullptr);
+
+    //glutIdleFunc(spinTorus);
+
+      //glutKeyboardFunc(keyboard);
+
+    glutSpecialFunc(pressKey);
+
+
+    glutIgnoreKeyRepeat(1);
+    glutSpecialUpFunc(releaseKey);
+
+    glutMainLoop();
 }
 
 void GameEngine::cleanUp()
@@ -142,7 +222,7 @@ void GameEngine::cleanUp()
 
 void GameEngine::runPhysics()
 {
-    std::shared_ptr<Player> player = gameState->getPlayer();
+    std::shared_ptr<Player> player = gameState.getPlayer();
     if (player->getZ() > 0)
     {
         player->setZ(player->getZ() - 0.1f);
@@ -161,6 +241,44 @@ void GameEngine::checkSDLError(int line)
             std::cout << "\nLine : " << line << std::endl;
 
         SDL_ClearError();
+    }
+}
+
+void GameEngine::pressKey(int key, int xx, int yy)
+{
+    switch (key) {
+        case GLUT_KEY_LEFT:
+            deltaAngle = -0.05f;
+            std::cout << "LEFT" << deltaAngle;
+        break;
+        case GLUT_KEY_RIGHT:
+            deltaAngle = 0.05f;
+            std::cout << "RIGHT";
+        break;
+        case GLUT_KEY_UP:
+            deltaMove = 0.5f;
+            std::cout << "UP";
+        break;
+        case GLUT_KEY_DOWN:
+            deltaMove = -0.5f;
+            std::cout << "DOWN";
+        break;
+    }
+}
+
+void GameEngine::releaseKey(int key, int x, int y)
+{
+
+    switch (key) {
+        case GLUT_KEY_LEFT :
+            std::cout << "LEFT" << deltaAngle;
+        case GLUT_KEY_RIGHT:
+            deltaAngle = 0.0f;
+        break;
+        case GLUT_KEY_UP:
+        case GLUT_KEY_DOWN:
+            deltaMove = 0;
+        break;
     }
 }
 
@@ -197,17 +315,19 @@ int GameEngine::getWidth()
     return width;
 }
 
-void GameEngine::setWidth(int width)
+void GameEngine::setWidth(int w)
 {
-    this->width = width;
+    width = w;
 }
+
 int GameEngine::getHeight()
 {
     return height;
 }
-void GameEngine::setHeight(int height)
+
+void GameEngine::setHeight(int h)
 {
-    this->height = height;
+    height = h;
 }
 
 float GameEngine::getFOV()
@@ -215,9 +335,9 @@ float GameEngine::getFOV()
     return fov;
 }
 
-void GameEngine::setFOV(float fov)
+void GameEngine::setFOV(float f)
 {
-    this->fov = fov;
+    fov = f;
 }
 
 int GameEngine::getViewDistance()
@@ -225,9 +345,9 @@ int GameEngine::getViewDistance()
     return viewDistance;
 }
 
-void GameEngine::setViewDistance(int viewDistance)
+void GameEngine::setViewDistance(int vd)
 {
-    this->viewDistance = viewDistance;
+    viewDistance = vd;
 }
 
 float GameEngine::toRadians(float degrees)
@@ -244,3 +364,21 @@ float GameEngine::aspectRatio(float width, float height)
 {
     return width / height;
 }
+
+bool GameEngine::loop = true;
+GameState GameEngine::gameState;
+SDL_GLContext GameEngine::ctx;
+SDL_Window* GameEngine::window;
+
+int GameEngine::width = 0;
+int GameEngine::height = 0;
+float GameEngine::fov = 0;
+int GameEngine::viewDistance = 0;
+
+float GameEngine::angle = 0.0f;
+float GameEngine::lx=0.0f;
+float GameEngine::lz=-1.0f;
+float GameEngine::x=0.0f;
+float GameEngine::z=5.0f;
+float GameEngine::deltaAngle = 0.0f;
+float GameEngine::deltaMove = 0;

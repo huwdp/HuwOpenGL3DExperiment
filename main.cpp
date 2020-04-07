@@ -10,18 +10,17 @@
 
 #include "GameEngine/gameengine.h"
 
-int main()
+int main(int argc, char** argv)
 {
-    std::shared_ptr<GameEngine> gameEngine = std::make_shared<GameEngine>();
 
-    if (!gameEngine->init())
+    if (GameEngine::init())
     {
         return -1;
     }
 
-    gameEngine->run();
+    GameEngine::run(argc, argv);
 
-    gameEngine->cleanUp();
+    GameEngine::cleanUp();
 
     return 0;
 }

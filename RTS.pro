@@ -2,9 +2,10 @@ TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
-LIBS += -lGL -lGLEW -lSDL2 -std=c++11 -lGLU
+LIBS += -lGL -lSDL2 -std=c++11 -lGLU -lGL -lGLU -lglut
 
 SOURCES += \
+    example.cpp \
         main.cpp \
     GameEngine/gameengine.cpp \
     Assets/tree.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     GameEngine/coord.h
 
 DISTFILES += \
+    README.md \
     main.txt \
     main2.txt \
     main4.txt

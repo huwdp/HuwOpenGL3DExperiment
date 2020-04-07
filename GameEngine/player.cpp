@@ -34,3 +34,13 @@ void Player::setLz(float lz)
 {
     this->lz = lz;
 }
+
+float Player::getHeight()
+{
+    return this->height;
+}
+
+void Player::setHeight(float height)
+{
+    this->height = height;
+}

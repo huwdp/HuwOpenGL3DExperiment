@@ -24,6 +24,11 @@ private:
     std::shared_ptr<Player> player;
 
 
+    double angle = 0.0;
+    double lx=0.0,lz=-1.0;
+    double x=0.0, z=10.0;
+    double deltaAngle = 0.0;
+    double deltaMove = 0;
 
 public:
     GameState();
@@ -33,6 +38,11 @@ public:
 
     std::vector<std::shared_ptr<Player>> getPlayers();
     void setPlayers(std::vector<std::shared_ptr<Player>> players);
+
+    void pressKey(int key, int xx, int yy);
+    void releaseKey(int key, int x, int y);
+
+    void reshape(int w, int h);
 
     std::shared_ptr<Player> getPlayer();
     void setPlayer(std::shared_ptr<Player> player);

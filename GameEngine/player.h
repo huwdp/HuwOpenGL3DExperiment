@@ -11,6 +11,7 @@ private:
     std::string name;
     float lx = 0.0;
     float lz = -1.0f;
+    float height = 0.0f;
 public:
     Player();
     Player(float x, float y, float z);
@@ -19,7 +20,8 @@ public:
     void setLx(float lx);
     float getLz();
     void setLz(float lz);
-
+    float getHeight();
+    void setHeight(float height);
 };
 
 #endif // PLAYER_H
