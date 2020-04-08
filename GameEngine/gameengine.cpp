@@ -11,81 +11,33 @@
 #include <memory>
 
 #include "gameengine.h"
+#include "player.h"
 
 
 bool GameEngine::init()
 {
     loop = true;
 
-
-
-    /*
-    //Initialize SDL
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-    {
-        printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
-        return 1;
-    }
-
-    //Create window
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    window = SDL_CreateWindow("SDL AR Example",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL);
-
-    if(window == NULL)
-    {
-        printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-        return false;
-    }
-
-    //creating new context
-    ctx = SDL_GL_CreateContext(window);
-    SDL_GL_SetSwapInterval(1);
-
-
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glShadeModel(GL_SMOOTH);
-    return true;
-    */
-
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);
 
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_LINE_SMOOTH, GL_NICEST);
-    glEnable(GL_POINT_SMOOTH);
-    glHint(GL_POINT_SMOOTH, GL_NICEST);
+    glEnable(GL_DEPTH_TEST);            // Enable Z buffer test depth
+    glEnable(GL_SMOOTH);                // Unknown
+    //glEnable(GL_LIGHTING);            // Enable lighting - Will be useful in future!
+    glEnable(GL_LINE_SMOOTH);           // Smooth lines
+    glEnable(GL_POINT_SMOOTH);          // Smoooth points
+    //glEnable(GL_CULL_FACE);           // Culling
+    glHint(GL_LINE_SMOOTH, GL_NICEST);  // Smooth lines - Is this needed?
+    glHint(GL_POINT_SMOOTH, GL_NICEST); // Smoooth points - Is this needed?
 
+    glEnable(GL_MULTISAMPLE);
+    glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
+    glEnable(GL_MULTISAMPLE);
 
-    glEnable(GL_SMOOTH);
-    glEnable(GL_LIGHTING);
-
-    // Setup the materials for LIGHT0
-
-    // Enable the light
-    glEnable(GL_LIGHT0);
-    glEnable(GL_TEXTURE_2D);
-
-
-
-    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glShadeModel(GL_SMOOTH);
+    //glLoadIdentity();
 }
 
  void GameEngine::computePos(double deltaMove) {
@@ -102,110 +54,112 @@ void GameEngine::computeDir(double deltaAngle) {
 
 void GameEngine::reshape(int w, int h)
 {
+    // Prevent a divide by zero, when window is too short
+    // (you cant make a window of zero width).
+    if(h == 0)
+        h = 1;
+    float ratio = 1.0* w / h;
+
+    // Use the Projection Matrix
+    glMatrixMode(GL_PROJECTION);
+
+    // Reset Matrix
+    glLoadIdentity();
+
+    // Set the viewport to be the entire window
+    glViewport(0, 0, w, h);
+
+    // Set the correct perspective.
+    gluPerspective(fov,ratio,1,1000);
+
+    // Get Back to the Modelview
+    glMatrixMode(GL_MODELVIEW);
+
+
+    /*glLoadIdentity();
     glViewport(0,0,(GLsizei) w, (GLsizei) h);
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(50.0,(GLfloat)w/(GLfloat)h,1.0,200.0);
+    gluPerspective(fov,(GLfloat)w/(GLfloat)h,1.0,200.0);
     glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();*/
 }
 
 void GameEngine::draw()
 {
-    static float cube[8][3] = {
-        {0.5, 0.5, -0.5},
-        {0.5, -0.5, -0.5},
-        {-0.5, -0.5, -0.5},
-        {-0.5, 0.5, -0.5},
-        {-0.5, 0.5, 0.5},
-        {0.5, 0.5, 0.5},
-        {0.5, -0.5, 0.5},
-        {-0.5, -0.5, 0.5}
-    };
-
-    /* Do our drawing, too. */
-    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Reset transformations
+    glLoadIdentity();
+
+    // Set the camera
+    gluLookAt(x, 1.0f, z, x+lx, 1.0f,  z+lz, 0.0f, 1.0f,  0.0f);
+
+    // Draw ground
+    glColor3f(0.0f, 0.3f, 0.0f);
     glBegin(GL_QUADS);
-
-
-    glColor3f(1.0, 0.0, 0.0);
-    glVertex3fv(cube[0]);
-    glVertex3fv(cube[1]);
-    glVertex3fv(cube[2]);
-    glVertex3fv(cube[3]);
-
-    glColor3f(0.0, 1.0, 0.0);
-    glVertex3fv(cube[3]);
-    glVertex3fv(cube[4]);
-    glVertex3fv(cube[7]);
-    glVertex3fv(cube[2]);
-
-    glColor3f(0.0, 0.0, 1.0);
-    glVertex3fv(cube[0]);
-    glVertex3fv(cube[5]);
-    glVertex3fv(cube[6]);
-    glVertex3fv(cube[1]);
-
-    glColor3f(0.0, 1.0, 1.0);
-    glVertex3fv(cube[5]);
-    glVertex3fv(cube[4]);
-    glVertex3fv(cube[7]);
-    glVertex3fv(cube[6]);
-
-    glColor3f(1.0, 1.0, 0.0);
-    glVertex3fv(cube[5]);
-    glVertex3fv(cube[0]);
-    glVertex3fv(cube[3]);
-    glVertex3fv(cube[4]);
-
-    glColor3f(1.0, 0.0, 1.0);
-    glVertex3fv(cube[6]);
-    glVertex3fv(cube[1]);
-    glVertex3fv(cube[2]);
-    glVertex3fv(cube[7]);
-
-
+        glVertex3f(-100.0f, 0.0f, -100.0f);
+        glVertex3f(-100.0f, 0.0f,  100.0f);
+        glVertex3f( 100.0f, 0.0f,  100.0f);
+        glVertex3f( 100.0f, 0.0f, -100.0f);
     glEnd();
 
-    glMatrixMode(GL_MODELVIEW);
-    //glRotatef(5.0, 1.0, 1.0, 1.0);
-    glFlush();
-    glutSwapBuffers();
-    GLenum errCode;
-    const GLubyte *errString;
-    if((errCode = glGetError()) != GL_NO_ERROR)
-    {
-       errString = gluErrorString(errCode);
-       fprintf (stderr,"OpenGL error : %s\n",errString);
-    }
 
+    // Draw solid dodecahedron
+    glColor3f(0.0f, 0.0f, 0.7f);
+    glTranslatef(-8.0f ,0.75f, 0.0f);
+    glutSolidDodecahedron();
+
+
+    // Draw solid wire torus
+    glColor3f(0.0f, 0.0f, 0.7f);
+    glTranslatef(2.0f ,0.0f, 0.0f);
+    glutWireTorus(0.5, 0.5, 0.5, 0.5);
+
+    // Draw solid cone
+    glColor3f(0.0f, 0.0f, 0.7f);
+    glTranslatef(2.0f ,0.0f, 0.0f);
+    glutSolidCone(1, 1, 6, 6);
+
+
+    glTranslatef(2.0f ,0.0f, 0.0f);
+    glColor3f(2.0f, 0.0f, 0.0f);
+    glutSolidSphere(0.5f,20,20);
+
+    // Tree
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glTranslatef(2.0f ,0.75f, 0.0f);
+    glutSolidCube(0.5);
+
+
+
+    glColor3f(0.737255f, 0.560784f, 0.560784f);
+    glTranslatef(2.0f ,0.0f, 0.0f);
+    glutSolidTeapot(0.5);
+
+
+    glColor3f(0.737255f, 0.560784f, 0.560784f);
+    glTranslatef(2.0f ,0.0f, 0.0f);
+    glutWireTeapot(0.5);
+
+    glutSwapBuffers();
     glutPostRedisplay();
 }
 
 void GameEngine::run(int argc, char** argv)
 {
-    std::shared_ptr<Player> player = gameState.getPlayer();
-
     glutInit(&argc,argv);
     glutInitDisplayMode(GLUT_DOUBLE |GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(500,500);
-    glutInitWindowPosition(100,100);
-    glutCreateWindow(argv[0]);
+    glutInitWindowSize(width,height);
+    //glutInitWindowPosition(100,100);
+    glutCreateWindow(programName.c_str());
     init();
     glutDisplayFunc(draw);
-    //glutReshapeFunc(reshape, nullptr);
-
-    //glutIdleFunc(spinTorus);
-
-      //glutKeyboardFunc(keyboard);
-
-    glutSpecialFunc(pressKey);
-
-
+    glutReshapeFunc(reshape);
+    //glutKeyboardFunc(keyboard);
+    //glutSpecialFunc(pressKey);
+    glutSpecialFunc(processSpecialKeys);
     glutIgnoreKeyRepeat(1);
     glutSpecialUpFunc(releaseKey);
-
     glutMainLoop();
 }
 
@@ -217,16 +171,10 @@ void GameEngine::cleanUp()
     }
     SDL_DestroyWindow( window );
     SDL_Quit();
-    //exit(rc);
 }
 
 void GameEngine::runPhysics()
 {
-    std::shared_ptr<Player> player = gameState.getPlayer();
-    if (player->getZ() > 0)
-    {
-        player->setZ(player->getZ() - 0.1f);
-    }
 }
 
 void GameEngine::checkSDLError(int line)
@@ -246,40 +194,38 @@ void GameEngine::checkSDLError(int line)
 
 void GameEngine::pressKey(int key, int xx, int yy)
 {
+
+}
+
+void GameEngine::processSpecialKeys(int key, int xx, int yy)
+{
+    std::cout << "Angle: " << angle << "Lx: " << lx << "Lz: " << lz << std::endl;
+
+    float fraction = 0.1f;
     switch (key) {
-        case GLUT_KEY_LEFT:
-            deltaAngle = -0.05f;
-            std::cout << "LEFT" << deltaAngle;
-        break;
-        case GLUT_KEY_RIGHT:
-            deltaAngle = 0.05f;
-            std::cout << "RIGHT";
-        break;
-        case GLUT_KEY_UP:
-            deltaMove = 0.5f;
-            std::cout << "UP";
-        break;
-        case GLUT_KEY_DOWN:
-            deltaMove = -0.5f;
-            std::cout << "DOWN";
-        break;
+        case GLUT_KEY_LEFT :
+            angle -= 0.05f;
+            lx = sin(angle);
+            lz = -cos(angle);
+            break;
+        case GLUT_KEY_RIGHT :
+            angle += 0.05f;
+            lx = sin(angle);
+            lz = -cos(angle);
+            break;
+        case GLUT_KEY_UP :
+            x += lx * fraction;
+            z += lz * fraction;
+            break;
+        case GLUT_KEY_DOWN :
+            x -= lx * fraction;
+            z -= lz * fraction;
+            break;
     }
 }
 
 void GameEngine::releaseKey(int key, int x, int y)
 {
-
-    switch (key) {
-        case GLUT_KEY_LEFT :
-            std::cout << "LEFT" << deltaAngle;
-        case GLUT_KEY_RIGHT:
-            deltaAngle = 0.0f;
-        break;
-        case GLUT_KEY_UP:
-        case GLUT_KEY_DOWN:
-            deltaMove = 0;
-        break;
-    }
 }
 
 void GameEngine::printSDLGLAttributes()
@@ -366,13 +312,13 @@ float GameEngine::aspectRatio(float width, float height)
 }
 
 bool GameEngine::loop = true;
-GameState GameEngine::gameState;
 SDL_GLContext GameEngine::ctx;
 SDL_Window* GameEngine::window;
 
-int GameEngine::width = 0;
-int GameEngine::height = 0;
-float GameEngine::fov = 0;
+std::string GameEngine::programName = "Huw's OpenGL 3D experiment";
+int GameEngine::width = 800;
+int GameEngine::height = 800;
+float GameEngine::fov = 90.0f;
 int GameEngine::viewDistance = 0;
 
 float GameEngine::angle = 0.0f;
@@ -380,5 +326,3 @@ float GameEngine::lx=0.0f;
 float GameEngine::lz=-1.0f;
 float GameEngine::x=0.0f;
 float GameEngine::z=5.0f;
-float GameEngine::deltaAngle = 0.0f;
-float GameEngine::deltaMove = 0;

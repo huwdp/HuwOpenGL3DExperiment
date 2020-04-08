@@ -12,14 +12,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
-#include "gamestate.h"
-
 #include <GL/glut.h>
 
 class GameEngine
 {
 public:
-    static GameState gameState;
+
     static SDL_GLContext mainContext;
     static SDL_Window *mainWindow;
     static std::string programName;
@@ -57,6 +55,7 @@ public:
 
     static void pressKey(int key, int xx, int yy);
     static void releaseKey(int key, int x, int y);
+    static void processSpecialKeys(int key, int xx, int yy);
 
 
 

@@ -12,15 +12,11 @@
 
 int main(int argc, char** argv)
 {
-
     if (GameEngine::init())
     {
         return -1;
     }
-
     GameEngine::run(argc, argv);
-
     GameEngine::cleanUp();
-
     return 0;
 }
