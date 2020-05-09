@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <iostream>
+#include <vector>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,10 +15,11 @@
 
 #include <GL/glut.h>
 
+#include "objects/object.h"
+
 class GameEngine
 {
 public:
-
     static SDL_GLContext mainContext;
     static SDL_Window *mainWindow;
     static std::string programName;
@@ -25,6 +27,8 @@ public:
     static int height;
     static float fov;
     static int viewDistance;
+
+    static std::vector<std::shared_ptr<Object>> objects;
 
     static void checkSDLError(int line = -1);
     static void printSDLGLAttributes();
@@ -35,13 +39,15 @@ public:
     static float x, z;
     static float deltaAngle;
     static float deltaMove;
+    static float forwardMovementSpeed;
+    static float leftRightMovementSpeed;
 
     static SDL_GLContext ctx;
     static SDL_Window* window;
 
     static bool loop;
 
-    static bool init();
+    static void init();
     static void draw();
     static void run(int argc, char **argv);
     static void runPhysics();
@@ -49,15 +55,17 @@ public:
 
     static void test();
 
-    static void computePos(double deltaMove);
-    static void computeDir(double deltaAngle);
+    static void computePos(float deltaMove);
+    static void computeDir(float deltaAngle);
+    static void movement();
+
     static void reshape(int w, int h);
 
     static void pressKey(int key, int xx, int yy);
     static void releaseKey(int key, int x, int y);
     static void processSpecialKeys(int key, int xx, int yy);
 
-
+    static void setupMap();
 
     static int getWidth();
     static void setWidth(int w);

@@ -1,4 +1,4 @@
-#include <GL/glut.h> // Once you include glut.h (you don't need gl.h or glu.h)
+#include <GL/glut.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -12,9 +12,10 @@
 
 #include "gameengine.h"
 #include "player.h"
+#include "objects/cube.h"
+#include "objects/texturedcube.h"
 
-
-bool GameEngine::init()
+void GameEngine::init()
 {
     loop = true;
 
@@ -37,27 +38,18 @@ bool GameEngine::init()
     glLoadIdentity();
     glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
     glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
-}
-
- void GameEngine::computePos(double deltaMove) {
-
-    x += deltaMove * lx * 0.2f;
-    z += deltaMove * lz * 0.2f;
-}
-
-void GameEngine::computeDir(double deltaAngle) {
-    angle += deltaAngle;
-    lx = sin(angle);
-    lz = -cos(angle);
+    glEnable(GL_TEXTURE_3D);
+    //glDepthFunc(GL_ALWAYS);
+    //glDisable(GL_STENCIL_TEST);
 }
 
 void GameEngine::reshape(int w, int h)
 {
-    // Prevent a divide by zero, when window is too short
-    // (you cant make a window of zero width).
-    if(h == 0)
+    if (h == 0)
+    {
         h = 1;
+    }
+
     float ratio = 1.0* w / h;
 
     // Use the Projection Matrix
@@ -70,40 +62,41 @@ void GameEngine::reshape(int w, int h)
     glViewport(0, 0, w, h);
 
     // Set the correct perspective.
-    gluPerspective(fov,ratio,1,1000);
+    gluPerspective(fov,ratio,1,100);
 
     // Get Back to the Modelview
     glMatrixMode(GL_MODELVIEW);
-
-
-    /*glLoadIdentity();
-    glViewport(0,0,(GLsizei) w, (GLsizei) h);
-    glMatrixMode(GL_PROJECTION);
-    gluPerspective(fov,(GLfloat)w/(GLfloat)h,1.0,200.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();*/
 }
 
 void GameEngine::draw()
 {
+    movement();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
 
     // Reset transformations
     glLoadIdentity();
 
     // Set the camera
-    gluLookAt(x, 1.0f, z, x+lx, 1.0f,  z+lz, 0.0f, 1.0f,  0.0f);
+    gluLookAt(x, 1.0f, z, x+lx, 1.0f,  z+lz, 0.0f, 1.5f,  0.0f);
 
     // Draw ground
-    glColor3f(0.0f, 0.3f, 0.0f);
+    glColor3f(0.0f, 0.6f, 0.0f);
     glBegin(GL_QUADS);
-        glVertex3f(-100.0f, 0.0f, -100.0f);
-        glVertex3f(-100.0f, 0.0f,  100.0f);
-        glVertex3f( 100.0f, 0.0f,  100.0f);
-        glVertex3f( 100.0f, 0.0f, -100.0f);
+        glVertex3f(-30.0f, 0.0f, -30.0f);
+        glVertex3f(-30.0f, 0.0f,  30.0f);
+        glVertex3f( 30.0f, 0.0f,  30.0f);
+        glVertex3f( 30.0f, 0.0f, -30.0f);
     glEnd();
 
+    for (auto it = objects.begin(); it != objects.end(); ++it)
+    {
+        glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        (*it)->draw();
+    }
 
+    /*
     // Draw solid dodecahedron
     glColor3f(0.0f, 0.0f, 0.7f);
     glTranslatef(-8.0f ,0.75f, 0.0f);
@@ -141,8 +134,35 @@ void GameEngine::draw()
     glTranslatef(2.0f ,0.0f, 0.0f);
     glutWireTeapot(0.5);
 
+
+
+    // Draw solid cone
+    glColor3f(0.0f, 0.0f, 0.7f);
+    glTranslatef(2.0f ,0.0f, 0.0f);
+    glutSolidCone(1, 1, 6, 6);
+    */
+
     glutSwapBuffers();
     glutPostRedisplay();
+}
+
+void GameEngine::setupMap()
+{
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
+    //objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 0.0f, 0.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
+    objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
+    objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
+
+
+
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 2.0f, 1.0f, 1.f, 1.f, 1.f));
+
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 1.f, 1.f, 1.f));
+
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 1.f, 1.f, 1.f));
+
+    //objects.push_back(std::make_shared<TexturedCube>(1.0f ,0.4f, 8.0f, 1.0f, 1.f, 1.f, 1.f, ""));
 }
 
 void GameEngine::run(int argc, char** argv)
@@ -152,14 +172,20 @@ void GameEngine::run(int argc, char** argv)
     glutInitWindowSize(width,height);
     //glutInitWindowPosition(100,100);
     glutCreateWindow(programName.c_str());
+
     init();
+    setupMap();
+
     glutDisplayFunc(draw);
     glutReshapeFunc(reshape);
     //glutKeyboardFunc(keyboard);
     //glutSpecialFunc(pressKey);
     glutSpecialFunc(processSpecialKeys);
     glutIgnoreKeyRepeat(1);
+    glutSpecialFunc(pressKey);
+    glutIgnoreKeyRepeat(1);
     glutSpecialUpFunc(releaseKey);
+
     glutMainLoop();
 }
 
@@ -192,14 +218,9 @@ void GameEngine::checkSDLError(int line)
     }
 }
 
-void GameEngine::pressKey(int key, int xx, int yy)
-{
-
-}
-
 void GameEngine::processSpecialKeys(int key, int xx, int yy)
 {
-    std::cout << "Angle: " << angle << "Lx: " << lx << "Lz: " << lz << std::endl;
+    /*std::cout << "Angle: " << angle << "Lx: " << lx << "Lz: " << lz << std::endl;
 
     float fraction = 0.1f;
     switch (key) {
@@ -221,11 +242,89 @@ void GameEngine::processSpecialKeys(int key, int xx, int yy)
             x -= lx * fraction;
             z -= lz * fraction;
             break;
+    }*/
+}
+
+void GameEngine::pressKey(int key, int xx, int yy)
+{
+
+    switch (key) {
+        case GLUT_KEY_LEFT : deltaAngle = -leftRightMovementSpeed; break;
+        case GLUT_KEY_RIGHT : deltaAngle = leftRightMovementSpeed; break;
+        case GLUT_KEY_UP : deltaMove = forwardMovementSpeed; break;
+        case GLUT_KEY_DOWN : deltaMove = -forwardMovementSpeed; break;
     }
 }
 
 void GameEngine::releaseKey(int key, int x, int y)
 {
+
+    switch (key) {
+        case GLUT_KEY_LEFT :
+        case GLUT_KEY_RIGHT : deltaAngle = 0.0f; break;
+        case GLUT_KEY_UP :
+        case GLUT_KEY_DOWN : deltaMove = 0; break;
+    }
+}
+
+void GameEngine::computePos(float deltaMove)
+{
+    x += deltaMove * lx * 0.1f;
+    z += deltaMove * lz * 0.1f;
+}
+
+void GameEngine::computeDir(float deltaAngle)
+{
+
+    angle += deltaAngle;
+    lx = sin(angle);
+    lz = -cos(angle);
+}
+
+void GameEngine::movement()
+{
+    float oldX = x;
+    float oldZ = z;
+
+    if (deltaMove)
+            computePos(deltaMove);
+    if (deltaAngle)
+        computeDir(deltaAngle);
+
+    // Collision detection
+    float offset = 0.3f;
+    bool collision = false;
+    for (auto it = objects.begin(); it != objects.end(); ++it)
+    {
+        auto box = (*it);
+        box->collision = false;
+
+        float left = (box->x - box->width-offset);
+        float right = (box->x + box->width+offset);
+        float top = (box->z - box->length-offset);
+        float bottom = (box->z + box->length+offset);
+
+        float tempX = x;
+        float tempY = z;
+
+        if (x > left &&
+            x < right &&
+            z > top &&
+            z < bottom
+                )
+        {
+            collision = true;
+            box->collision = true;
+            break;
+        }
+    }
+
+    if (collision)
+    {
+        x = oldX;
+        z = oldZ;
+        return;
+    }
 }
 
 void GameEngine::printSDLGLAttributes()
@@ -315,6 +414,8 @@ bool GameEngine::loop = true;
 SDL_GLContext GameEngine::ctx;
 SDL_Window* GameEngine::window;
 
+std::vector<std::shared_ptr<Object>> GameEngine::objects;
+
 std::string GameEngine::programName = "Huw's OpenGL 3D experiment";
 int GameEngine::width = 800;
 int GameEngine::height = 800;
@@ -326,3 +427,7 @@ float GameEngine::lx=0.0f;
 float GameEngine::lz=-1.0f;
 float GameEngine::x=0.0f;
 float GameEngine::z=5.0f;
+float GameEngine::deltaAngle = 0.0f;
+float GameEngine::deltaMove = 0;
+float GameEngine::forwardMovementSpeed = 0.8f;
+float GameEngine::leftRightMovementSpeed = 0.1f;
