@@ -7,8 +7,7 @@
 class TextureLoader
 {
 public:
-    TextureLoader();
-    GLuint LoadTexture(std::string fileLocation);
+    static GLuint loadTexture(std::string fileLocation);
 };
 
 #endif // TEXTURELOADER_H

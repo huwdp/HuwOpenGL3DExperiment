@@ -5,13 +5,23 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
 
 # Todo
  - Better movement
- - Textures
- - Diffuse lighting
- - Ambient lighting
- - Lighting (Phong or Gourand)
+ - ~~Textures~~
+ - ~~Diffuse lighting~~
+ - ~~Ambient lighting~~
+ - ~~Lighting (Phong or Gourand, phong chosen)~~
  - Object loader
  - Map (for objects)
- - Object collision
+ - ~~Object collision~~
+ - Cubemap
+ - Tree
+ - Basic 3D collision
+ - Picture frames
+ - Software Culling
+ - Game intro
+ - Grass
+ - Mechanics
+ - Fun
+ - Better texture format
 
 ## Dependencies
 

@@ -18,6 +18,7 @@ private:
     void load();
 public:
     TexturedCube(float x, float y, float z, float w, float h, float l, float r, float g, float b, std::string textureFileLocation);
+    ~TexturedCube();
     void draw();
 };
 

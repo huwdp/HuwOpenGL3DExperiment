@@ -1,11 +1,6 @@
 #include "textureloader.h"
 
-TextureLoader::TextureLoader()
-{
-
-}
-
-GLuint LoadTexture(std::string fileLocation)
+GLuint TextureLoader::loadTexture(std::string fileLocation)
 {
     GLuint texture;
     int width, height;

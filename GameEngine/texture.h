@@ -11,12 +11,12 @@ private:
     std::string textureFileLocation;
     unsigned char header[54];
     unsigned int dataPos;
-    unsigned int width, height;
     unsigned int imageSize;
     unsigned char *data;
 public:
     Texture(std::string textureFileLocation);
     ~Texture();
+    unsigned int width, height;
     TextureLoadStatus load();
     int getSize();
     unsigned char *getData();

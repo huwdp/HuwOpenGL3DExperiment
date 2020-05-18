@@ -14,6 +14,7 @@
 #include "player.h"
 #include "objects/cube.h"
 #include "objects/texturedcube.h"
+#include "objects/floor.h"
 
 void GameEngine::init()
 {
@@ -23,10 +24,10 @@ void GameEngine::init()
 
     glEnable(GL_DEPTH_TEST);            // Enable Z buffer test depth
     glEnable(GL_SMOOTH);                // Unknown
-    //glEnable(GL_LIGHTING);            // Enable lighting - Will be useful in future!
+
     glEnable(GL_LINE_SMOOTH);           // Smooth lines
     glEnable(GL_POINT_SMOOTH);          // Smoooth points
-    //glEnable(GL_CULL_FACE);           // Culling
+    glEnable(GL_CULL_FACE);           // Culling
     glHint(GL_LINE_SMOOTH, GL_NICEST);  // Smooth lines - Is this needed?
     glHint(GL_POINT_SMOOTH, GL_NICEST); // Smoooth points - Is this needed?
 
@@ -35,12 +36,73 @@ void GameEngine::init()
 
     glEnable(GL_MULTISAMPLE);
 
+    glEnable(GL_TEXTURE_2D);
+
     glLoadIdentity();
     glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_TEXTURE_3D);
     //glDepthFunc(GL_ALWAYS);
     //glDisable(GL_STENCIL_TEST);
+
+    // Lighting
+    glEnable(GL_LIGHTING);            // Enable lighting
+    glEnable(GL_LIGHT0);
+    //GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    //GLfloat mat_shininess[] = { 50.0 };
+    //GLfloat light_position[] = { 1.0, 1.0, 2.0, 0.0 };
+
+    //glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    //glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    //glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    //GL_AMBIENT
+    //GL_DIFFUSE
+    //GL_SPECULAR
+
+
+
+
+    ////// Lighting variables
+    float ambientLight[] = {1.0f, 1.0f, 1.0f, 1.0f  };	// ambient light
+    float diffuseLight[] = {1.0f, 1.0f, 1.0f, 1.0f };	// diffuse light
+    float lightPosition[] = {10.0f, 10.0f, 10.0f, 0.0f };	// the light position
+
+    ////// Material variables
+    float matAmbient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    float matDiff[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    float matAmbient1[] = { 0.8f, 0.3f, 0.8f, 1.0f };
+    float matDiff1[] = { 0.525f, 0.25f, 0.25f, 1.0f };
+
+    float matAmbient2[] = { 1.f, 1.0f, 1.0f, 1.0f };
+    float matDiff2[] = { 0.50f, 0.50f, 0.50f, 0.5f };
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient2);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiff2);
+
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_position[] = { 1.0, 3.0, 1.0, 0.0 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    // Setup the materials for LIGHT0
+    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiff);
+
+    // Now setup LIGHT0
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+    // Enable the light
+    glEnable(GL_LIGHT0);
+    glEnable(GL_TEXTURE_2D);
 }
 
 void GameEngine::reshape(int w, int h)
@@ -81,14 +143,7 @@ void GameEngine::draw()
     // Set the camera
     gluLookAt(x, 1.0f, z, x+lx, 1.0f,  z+lz, 0.0f, 1.5f,  0.0f);
 
-    // Draw ground
-    glColor3f(0.0f, 0.6f, 0.0f);
-    glBegin(GL_QUADS);
-        glVertex3f(-30.0f, 0.0f, -30.0f);
-        glVertex3f(-30.0f, 0.0f,  30.0f);
-        glVertex3f( 30.0f, 0.0f,  30.0f);
-        glVertex3f( 30.0f, 0.0f, -30.0f);
-    glEnd();
+
 
     for (auto it = objects.begin(); it != objects.end(); ++it)
     {
@@ -148,13 +203,14 @@ void GameEngine::draw()
 
 void GameEngine::setupMap()
 {
+    objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 30.0f, 0.1f, 0.f, 1.f, 0.f, "textures/wood.bmp"));
     objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
     objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
     //objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 0.0f, 0.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
     objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
     objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
 
-
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,0.0f, 0.0f, 0.3f, 1.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wood.bmp"));
 
     objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 2.0f, 1.0f, 1.f, 1.f, 1.f));
 
@@ -297,25 +353,28 @@ void GameEngine::movement()
     for (auto it = objects.begin(); it != objects.end(); ++it)
     {
         auto box = (*it);
-        box->collision = false;
-
-        float left = (box->x - box->width-offset);
-        float right = (box->x + box->width+offset);
-        float top = (box->z - box->length-offset);
-        float bottom = (box->z + box->length+offset);
-
-        float tempX = x;
-        float tempY = z;
-
-        if (x > left &&
-            x < right &&
-            z > top &&
-            z < bottom
-                )
+        if (box->collidable)
         {
-            collision = true;
-            box->collision = true;
-            break;
+            box->collision = false;
+
+            float left = (box->x - box->width-offset);
+            float right = (box->x + box->width+offset);
+            float top = (box->z - box->length-offset);
+            float bottom = (box->z + box->length+offset);
+
+            float tempX = x;
+            float tempY = z;
+
+            if (x > left &&
+                x < right &&
+                z > top &&
+                z < bottom
+                    )
+            {
+                collision = true;
+                box->collision = true;
+                break;
+            }
         }
     }
 
