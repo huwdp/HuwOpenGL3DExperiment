@@ -201,24 +201,34 @@ void GameEngine::draw()
     glutPostRedisplay();
 }
 
+bool GameEngine::assets()
+{
+    textures["wood"] = std::make_shared<Texture>("textures/wood.bmp");
+    textures["wallpaper"] = std::make_shared<Texture>("textures/wall.bmp");
+
+    /*for (std::unordered_map<std::string, std::make_shared<Texture>>::iterator it = textures.begin(); it != textures.end(); ++it)
+    {
+        std::shared_ptr<Texture> tex = (*it)->second;
+        if (tex->load() != SUCCESS)
+        {
+            std::cout << "Error: Could not open \"" + tex->textureFileLocation + "\"" << std::endl;
+            return false;
+        }
+    }*/
+    return true;
+}
+
 void GameEngine::setupMap()
 {
-    objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 30.0f, 0.1f, 0.f, 1.f, 0.f, "textures/wood.bmp"));
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
-    //objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 0.0f, 0.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
-    objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
-    objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wall.bmp"));
-
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,0.0f, 0.0f, 0.3f, 1.0f, 2.0f, 1.f, 1.f, 1.f, "textures/wood.bmp"));
-
+    objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 30.0f, 0.1f, 0.f, 1.f, 0.f, textures["wood"]));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,0.0f, 0.0f, 0.3f, 1.0f, 2.0f, 1.f, 1.f, 1.f, textures["wood"]));
     objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 2.0f, 1.0f, 1.f, 1.f, 1.f));
-
     objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 1.f, 1.f, 1.f));
-
     objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 1.f, 1.f, 1.f));
-
-    //objects.push_back(std::make_shared<TexturedCube>(1.0f ,0.4f, 8.0f, 1.0f, 1.f, 1.f, 1.f, ""));
 }
 
 void GameEngine::run(int argc, char** argv)
@@ -226,12 +236,13 @@ void GameEngine::run(int argc, char** argv)
     glutInit(&argc,argv);
     glutInitDisplayMode(GLUT_DOUBLE |GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(width,height);
-    //glutInitWindowPosition(100,100);
     glutCreateWindow(programName.c_str());
-
     init();
+    if (!assets())
+    {
+        return;
+    }
     setupMap();
-
     glutDisplayFunc(draw);
     glutReshapeFunc(reshape);
     //glutKeyboardFunc(keyboard);
@@ -241,7 +252,6 @@ void GameEngine::run(int argc, char** argv)
     glutSpecialFunc(pressKey);
     glutIgnoreKeyRepeat(1);
     glutSpecialUpFunc(releaseKey);
-
     glutMainLoop();
 }
 
@@ -490,3 +500,5 @@ float GameEngine::deltaAngle = 0.0f;
 float GameEngine::deltaMove = 0;
 float GameEngine::forwardMovementSpeed = 0.8f;
 float GameEngine::leftRightMovementSpeed = 0.1f;
+
+std::unordered_map<std::string, std::shared_ptr<Texture>> GameEngine::textures;

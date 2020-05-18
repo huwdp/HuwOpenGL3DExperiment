@@ -3,7 +3,9 @@
 
 #include "object.h"
 #include <string>
+#include <memory>
 #include <GL/glut.h>
+#include "../texture.h"
 
 class Floor : public Object
 {
@@ -12,13 +14,10 @@ private:
     float r;
     float g;
     float b;
-    GLuint tex;
-    unsigned char texDat[512];
-    std::string textureFileLocation;
+    std::shared_ptr<Texture> texture;
     void load();
 public:
-    Floor(float x, float y, float z, float w, float h, float l, float r, float g, float b, std::string textureFileLocation);
-    ~Floor();
+    Floor(float x, float y, float z, float w, float h, float l, float r, float g, float b, std::shared_ptr<Texture> texture);
     void draw();
 };
 

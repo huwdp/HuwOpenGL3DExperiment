@@ -1,5 +1,10 @@
 #include "textureloader.h"
 
+TextureLoader::TextureLoader()
+{
+
+}
+
 GLuint TextureLoader::loadTexture(std::string fileLocation)
 {
     GLuint texture;
@@ -37,3 +42,5 @@ GLuint TextureLoader::loadTexture(std::string fileLocation)
     free( data );
     return texture;
 }
+
+TextureLoader::TextureLoader();

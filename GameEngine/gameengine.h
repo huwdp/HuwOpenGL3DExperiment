@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <unordered_map>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
@@ -16,6 +17,8 @@
 #include <GL/glut.h>
 
 #include "objects/object.h"
+
+#include "texture.h"
 
 class GameEngine
 {
@@ -48,6 +51,7 @@ public:
     static bool loop;
 
     static void init();
+    static bool assets();
     static void draw();
     static void run(int argc, char **argv);
     static void runPhysics();
@@ -80,6 +84,9 @@ public:
     static float toRadians(float degrees);
     static float aspectRatio(int width, int height);
     static float aspectRatio(float width, float height);
+
+    // Assets
+    static std::unordered_map<std::string, std::shared_ptr<Texture>>textures;
 
 };
 

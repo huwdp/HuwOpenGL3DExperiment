@@ -22,6 +22,10 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  - Mechanics
  - Fun
  - Better texture format
+ - AI
+ - Pathfinding
+ - WASD
+ - Mouse control
 
 ## Dependencies
 
