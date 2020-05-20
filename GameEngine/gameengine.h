@@ -17,12 +17,18 @@
 #include <GL/glut.h>
 
 #include "objects/object.h"
+#include "npc.h"
 
 #include "texture.h"
 
 class GameEngine
 {
 public:
+    static const int GRID_MAP_WIDTH = 200;
+    static const int GRID_MAP_HEIGHT = 200;
+    static float gridBlockWidth;
+    static float gridBlockHeight;
+
     static SDL_GLContext mainContext;
     static SDL_Window *mainWindow;
     static std::string programName;
@@ -32,6 +38,8 @@ public:
     static int viewDistance;
 
     static std::vector<std::shared_ptr<Object>> objects;
+    static std::vector<std::shared_ptr<NPC>> npcs;
+    static std::vector<std::shared_ptr<Object>> gridCollisionFloor;
 
     static void checkSDLError(int line = -1);
     static void printSDLGLAttributes();
@@ -44,6 +52,7 @@ public:
     static float deltaMove;
     static float forwardMovementSpeed;
     static float leftRightMovementSpeed;
+    static int grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
 
     static SDL_GLContext ctx;
     static SDL_Window* window;
@@ -70,6 +79,10 @@ public:
     static void processSpecialKeys(int key, int xx, int yy);
 
     static void setupMap();
+    static void setupNpcs();
+
+    // Pathfinding
+    static void setupGrid();
 
     static int getWidth();
     static void setWidth(int w);

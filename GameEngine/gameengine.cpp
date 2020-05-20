@@ -144,10 +144,17 @@ void GameEngine::draw()
     gluLookAt(x, 1.0f, z, x+lx, 1.0f,  z+lz, 0.0f, 1.5f,  0.0f);
 
 
-
+    // Draw objects
     for (auto it = objects.begin(); it != objects.end(); ++it)
     {
-        glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        (*it)->draw();
+    }
+
+    // Draw grid floor collisions
+    for (auto it = gridCollisionFloor.begin(); it != gridCollisionFloor.end(); ++it)
+    {
+        //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
         (*it)->draw();
     }
 
@@ -225,10 +232,109 @@ void GameEngine::setupMap()
     objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
     objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
     objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,0.0f, 0.0f, 0.3f, 1.0f, 2.0f, 1.f, 1.f, 1.f, textures["wood"]));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 2.0f, 1.0f, 1.f, 1.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 1.f, 1.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 1.f, 1.f, 1.f));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
+}
+
+void GameEngine::setupNpcs()
+{
+    objects.push_back(std::make_shared<NPC>(5.0f ,0.0f, 5.0f, 0.5f, 0.5f, 2.0f, 1.0f, 1.f, 1.f, textures["wallpaper"]));
+}
+
+void GameEngine::setupGrid()
+{
+    float mostTop = 0.0f;
+    float mostBottom = 0.0f;
+    float mostLeft = 0.0f;
+    float mostRight = 0.0f;
+    float boundry = 1.0f;
+
+    for (auto it = objects.begin(); it != objects.end(); ++it)
+    {
+        auto obj = (*it);
+        if (obj->x < mostLeft)
+        {
+            mostLeft = obj->x;
+        }
+        if (obj->x > mostRight)
+        {
+            mostRight = obj->x;
+        }
+        if (obj->z < mostTop)
+        {
+            mostTop = obj->z;
+        }
+        if (obj->z > mostBottom)
+        {
+            mostBottom = obj->z;
+        }
+    }
+
+    float mapWidth = mostRight-mostLeft;
+    float mapHeight = mostBottom-mostTop;
+    gridBlockWidth = mapWidth/GRID_MAP_WIDTH;
+    gridBlockHeight = mapHeight/GRID_MAP_HEIGHT;
+
+    for (int i = 0; i < GRID_MAP_WIDTH; ++i)
+    {
+        for (int j = 0; j < GRID_MAP_WIDTH; ++j)
+        {
+            grid[i][j] = 0;
+        }
+    }
+
+    // Optimise this in the future
+    for (auto it = objects.begin(); it != objects.end(); ++it)
+    {
+        auto obj = (*it);
+        if (obj->collidable)
+        {
+            for (int i = 0; i < GRID_MAP_WIDTH; ++i)
+            {
+                for (int j = 0; j < GRID_MAP_WIDTH; ++j)
+                {
+                    float bob1 = gridBlockWidth;
+                    float bob2 = gridBlockHeight;
+                    float ix = i*gridBlockWidth;
+                    float jx = j*gridBlockHeight;
+
+                    bool xInside = false;
+                    bool zInside = false;
+
+                    if (obj->x-obj->width/2-gridBlockWidth <= ix && obj->x+obj->width/2+gridBlockWidth >= ix+gridBlockWidth) // Is inside
+                    {
+                        xInside = true;
+                    }
+
+                    if (obj->z-obj->length/2-gridBlockHeight <= jx && obj->z+obj->length/2+gridBlockHeight >= jx+gridBlockHeight)
+                    {
+                        zInside = true;
+                    }
+
+                    if (xInside && zInside)
+                    {
+                        grid[i][j] = 1;
+                    }
+
+                }
+            }
+        }
+    }
+
+    // Optional
+    // Draw grid map (Optional)
+    for (int i = 0; i < GRID_MAP_WIDTH; ++i)
+    {
+        for (int j = 0; j < GRID_MAP_HEIGHT; ++j)
+        {
+            if (grid[i][j] == 1)
+            {
+                gridCollisionFloor.push_back(std::make_shared<Floor>(i*gridBlockWidth ,-0.9f, j*gridBlockHeight, gridBlockWidth, gridBlockHeight, 0.1f, 0.f, 1.f, 0.f, textures["wallpaper"]));
+            }
+        }
+    }
 }
 
 void GameEngine::run(int argc, char** argv)
@@ -243,6 +349,8 @@ void GameEngine::run(int argc, char** argv)
         return;
     }
     setupMap();
+    setupNpcs();
+    setupGrid();
     glutDisplayFunc(draw);
     glutReshapeFunc(reshape);
     //glutKeyboardFunc(keyboard);
@@ -484,12 +592,16 @@ SDL_GLContext GameEngine::ctx;
 SDL_Window* GameEngine::window;
 
 std::vector<std::shared_ptr<Object>> GameEngine::objects;
+std::vector<std::shared_ptr<NPC>> GameEngine::npcs;
+std::vector<std::shared_ptr<Object>> GameEngine::gridCollisionFloor;
 
 std::string GameEngine::programName = "Huw's OpenGL 3D experiment";
 int GameEngine::width = 800;
 int GameEngine::height = 800;
 float GameEngine::fov = 90.0f;
 int GameEngine::viewDistance = 0;
+float GameEngine::gridBlockWidth;
+float GameEngine::gridBlockHeight;
 
 float GameEngine::angle = 0.0f;
 float GameEngine::lx=0.0f;
@@ -502,3 +614,5 @@ float GameEngine::forwardMovementSpeed = 0.8f;
 float GameEngine::leftRightMovementSpeed = 0.1f;
 
 std::unordered_map<std::string, std::shared_ptr<Texture>> GameEngine::textures;
+
+int GameEngine::grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
