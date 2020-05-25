@@ -5,6 +5,7 @@ CONFIG -= qt
 LIBS += -lGL -lSDL2 -std=c++11 -lGLU -lGL -lGLU -lglut
 
 SOURCES += \
+    GameEngine/ai/gridnode.cpp \
     GameEngine/npc.cpp \
     GameEngine/objects/cube.cpp \
     GameEngine/objects/floor.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
     GameEngine/coord.cpp
 
 HEADERS += \
+    GameEngine/ai/gridnode.h \
     GameEngine/gameengine.h \
     GameEngine/npc.h \
     GameEngine/objects/cube.h \
