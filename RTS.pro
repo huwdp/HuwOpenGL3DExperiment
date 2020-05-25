@@ -12,7 +12,6 @@ SOURCES += \
     GameEngine/objects/object.cpp \
     GameEngine/objects/texturedcube.cpp \
     GameEngine/texture.cpp \
-    GameEngine/textureloader.cpp \
         main.cpp \
     GameEngine/gameengine.cpp \
     GameEngine/player.cpp \
@@ -28,8 +27,7 @@ HEADERS += \
     GameEngine/objects/texturedcube.h \
     GameEngine/player.h \
     GameEngine/coord.h \
-    GameEngine/texture.h \
-    GameEngine/textureloader.h
+    GameEngine/texture.h
 
 DISTFILES += \
     LICENSE \
