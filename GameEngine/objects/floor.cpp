@@ -2,7 +2,7 @@
 
 #include <GL/glut.h>
 
-Floor::Floor(float x, float y, float z, float w, float h, float l, float r, float g, float b, std::shared_ptr<Texture> texture)
+Floor::Floor(float x, float y, float z, float w, float l, float h, float r, float g, float b, std::shared_ptr<Texture> texture)
     : Object(x, y ,z, w, h, l)
 {
     this->texture = texture;

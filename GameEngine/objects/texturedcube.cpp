@@ -2,8 +2,14 @@
 
 #include <GL/glut.h>
 
-TexturedCube::TexturedCube(float x, float y, float z, float w, float h, float l, float r, float g, float b, std::shared_ptr<Texture> texture)
+TexturedCube::TexturedCube(float x, float y, float z, float w, float l, float h, float r, float g, float b, std::shared_ptr<Texture> texture)
     : Object(x, y ,z, w, h, l)
+{
+    this->texture = texture;
+}
+
+TexturedCube::TexturedCube(float x, float y, float z, float w, float l, float h, float r, float g, float b, std::shared_ptr<Texture> texture, int id)
+    : Object(x, y ,z, w, h, l, id)
 {
     this->texture = texture;
 }
@@ -37,46 +43,46 @@ void TexturedCube::draw()
 
     glBegin(GL_POLYGON);
         glNormal3f(0.0f, 1.0f, 0.0f);	// top face
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(width, length, height);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(width, length, -height);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(-width, length, -height);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-width, length, height);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(width, height, length);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(width, height, -length);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(-width, height, -length);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-width, height, length);
     glEnd();
     glBegin(GL_POLYGON);
         glNormal3f(0.0f, 0.0f, 1.0f);	// front face
-        glTexCoord2f(0.0f, 0.0f);glVertex3f(width, length, height);
-        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, length, height);
-        glTexCoord2f(1.0f, 1.0f);glVertex3f(-width, -length, height);
-        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, -length, height);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(width, height, length);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, height, length);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(-width, -height, length);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, -height, length);
     glEnd();
     glBegin(GL_POLYGON);
         glNormal3f(1.0f, 0.0f, 0.0f);	// right face
-        glTexCoord2f(0.0f, 0.0f);glVertex3f(width, length, height);
-        glTexCoord2f(1.0f, 0.0f);glVertex3f(width, -length, height);
-        glTexCoord2f(1.0f, 1.0f);glVertex3f(width, -length, -height);
-        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, length, -height);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(width, height, length);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(width, -height, length);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(width, -height, -length);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, height, -length);
     glEnd();
 
     glBegin(GL_POLYGON);
         glNormal3f(-1.0f, 0.0f, 0.0f);	// left face
-        glTexCoord2f(0.0f, 0.0f);glVertex3f(-width, length, height);
-        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, length, -height);
-        glTexCoord2f(1.0f, 1.0f);glVertex3f(-width, -length, -height);
-        glTexCoord2f(0.0f, 1.0f);glVertex3f(-width, -length, height);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(-width, height, length);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, height, -length);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(-width, -height, -length);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(-width, -height, length);
     glEnd();
     glBegin(GL_POLYGON);
         glNormal3f(0.0f, -1.0f, 0.0f);	// bottom face
-        glTexCoord2f(0.0f, 0.0f);glVertex3f(-width, -length, height);
-        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, -length, -height);
-        glTexCoord2f(1.0f, 1.0f);glVertex3f(width, -length, -height);
-        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, -length, height);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(-width, -height, length);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, -height, -length);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(width, -height, -length);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, -height, length);
     glEnd();
     glBegin(GL_POLYGON);
         glNormal3f(0.0f, 0.0f, -1.0f);	// back face
-        glTexCoord2f(0.0f, 0.0f);glVertex3f(width, -length, -height);
-        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, -length, -height);
-        glTexCoord2f(1.0f, 1.0f);glVertex3f(-width, length, -height);
-        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, length, -height);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(width, -height, -length);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(-width, -height, -length);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(-width, height, -length);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(width, height, -length);
     glEnd();
 
 

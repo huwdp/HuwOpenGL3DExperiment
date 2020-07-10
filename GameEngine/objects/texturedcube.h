@@ -17,7 +17,8 @@ private:
     void load();
     std::shared_ptr<Texture> texture;
 public:
-    TexturedCube(float x, float y, float z, float w, float h, float l, float r, float g, float b, std::shared_ptr<Texture> texture);
+    TexturedCube(float x, float y, float z, float w, float l, float h, float r, float g, float b, std::shared_ptr<Texture> texture);
+    TexturedCube(float x, float y, float z, float w, float l, float h, float r, float g, float b, std::shared_ptr<Texture> texture, int id);
     void draw();
 };
 

@@ -17,7 +17,7 @@ private:
     std::shared_ptr<Texture> texture;
     void load();
 public:
-    Floor(float x, float y, float z, float w, float h, float l, float r, float g, float b, std::shared_ptr<Texture> texture);
+    Floor(float x, float y, float z, float w, float l, float h, float r, float g, float b, std::shared_ptr<Texture> texture);
     void draw();
 };
 

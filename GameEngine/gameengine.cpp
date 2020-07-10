@@ -160,8 +160,8 @@ void GameEngine::pathfinder()
                                                           -0.9f,
                                                           y2DGridTo3DOpenGLGrid(gNode->y),
                                                           gridBlockWidth/2,
-                                                          gridBlockHeight/2,
                                                           0.1f,
+                                                          gridBlockHeight/2,
                                                           0.f,
                                                           1.f,
                                                           0.f,
@@ -499,7 +499,7 @@ bool GameEngine::assets()
 void GameEngine::setupMap()
 {
     // Floor
-    objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 30.0f, 0.1f, 0.f, 1.f, 0.f, textures["wood"]));
+    objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 0.1f, 30.0f, 0.f, 1.f, 0.f, textures["wood"]));
 
     //objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
 
@@ -550,13 +550,13 @@ void GameEngine::setupMapData()
         {
             mostRight = obj->x+obj->width/2;
         }
-        if (obj->z-obj->height/2 < mostTop)
+        if (obj->z-obj->length/2 < mostTop)
         {
-            mostTop = obj->z-obj->height/2;
+            mostTop = obj->z-obj->length/2;
         }
-        if (obj->z+obj->height/2 > mostBottom)
+        if (obj->z+obj->length/2 > mostBottom)
         {
-            mostBottom = obj->z+obj->height/2;
+            mostBottom = obj->z+obj->length/2;
         }
     }
 
@@ -585,8 +585,8 @@ void GameEngine::setupGrid()
             int leftSideOfObject = obj->x-obj->width/2;
             int rightSideOfObject = obj->x+obj->width/2;
 
-            int topSideOfObject = obj->z-obj->height/2;
-            int bottomSideOfObject = obj->z+obj->height/2;
+            int topSideOfObject = obj->z-obj->length/2;
+            int bottomSideOfObject = obj->z+obj->length/2;
 
             // Center
             //grid[x3DOpenGLGridTo2dGrid(obj->x)][y3DOpenGLGridTo2dGrid(obj->z)] = 1;
@@ -646,8 +646,8 @@ void GameEngine::setupGrid()
                                                                      -0.9f,
                                                                      y2DGridTo3DOpenGLGrid(j),
                                                                      gridBlockWidth/2,
-                                                                     gridBlockHeight/2,
                                                                      0.1f,
+                                                                     gridBlockHeight/2,
                                                                      0.f,
                                                                      1.f,
                                                                      0.f,
