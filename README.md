@@ -24,8 +24,9 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  - Better texture format
  - AI
  - ~~Pathfinding~~
- - WASD
+ - ~~WASD~~
  - Mouse control
+ ~~Main menu~~
 
 ## Dependencies
 
