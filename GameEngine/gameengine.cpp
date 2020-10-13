@@ -395,6 +395,21 @@ std::vector<std::shared_ptr<GridNode>> GameEngine::generatePath(int startX, int 
     return path;
 }
 
+void GameEngine::renderBitmapString(
+    float x,
+    float y,
+    float z,
+    void *font,
+    char *string)
+{
+    char *c;
+    glRasterPos3f(x, y,z);
+    for (c=string; *c != '\0'; c++)
+    {
+        glutBitmapCharacter(font, *c);
+    }
+}
+
 void GameEngine::draw()
 {
     movement();
@@ -404,6 +419,35 @@ void GameEngine::draw()
 
     // Reset transformations
     glLoadIdentity();
+
+
+    if (mainMenuToggle)
+    {
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        gluLookAt(0, 1.0f, 10, 0, 1.0f,  5, 0.0f, 1.5f,  0.0f);
+
+        int xx = 0;
+        int yy = 0;
+        for (auto it = mainMenu.begin(); it != mainMenu.end(); ++it)
+        {
+            glColor3f(.0f, .0f, .0f);
+            std::string menuText((*it).c_str());
+            if (mainMenuSelectedItem == xx)
+            {
+                glColor3f(.0f, .0f, 1.0f);
+                menuText.push_back('<');
+            }
+            char* chr = strdup(menuText.c_str());
+            renderBitmapString(0, yy--, 0, GLUT_BITMAP_8_BY_13, chr);
+            ++xx;
+        }
+
+        glutSwapBuffers();
+        glutPostRedisplay();
+        return;
+    }
+
+
 
     // Set the camera
     gluLookAt(x, 1.0f, z, x+lx, 1.0f,  z+lz, 0.0f, 1.5f,  0.0f);
@@ -428,52 +472,6 @@ void GameEngine::draw()
         //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
         (*it)->draw();
     }
-
-    /*
-    // Draw solid dodecahedron
-    glColor3f(0.0f, 0.0f, 0.7f);
-    glTranslatef(-8.0f ,0.75f, 0.0f);
-    glutSolidDodecahedron();
-
-
-    // Draw solid wire torus
-    glColor3f(0.0f, 0.0f, 0.7f);
-    glTranslatef(2.0f ,0.0f, 0.0f);
-    glutWireTorus(0.5, 0.5, 0.5, 0.5);
-
-    // Draw solid cone
-    glColor3f(0.0f, 0.0f, 0.7f);
-    glTranslatef(2.0f ,0.0f, 0.0f);
-    glutSolidCone(1, 1, 6, 6);
-
-
-    glTranslatef(2.0f ,0.0f, 0.0f);
-    glColor3f(2.0f, 0.0f, 0.0f);
-    glutSolidSphere(0.5f,20,20);
-
-    // Tree
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glTranslatef(2.0f ,0.75f, 0.0f);
-    glutSolidCube(0.5);
-
-
-
-    glColor3f(0.737255f, 0.560784f, 0.560784f);
-    glTranslatef(2.0f ,0.0f, 0.0f);
-    glutSolidTeapot(0.5);
-
-
-    glColor3f(0.737255f, 0.560784f, 0.560784f);
-    glTranslatef(2.0f ,0.0f, 0.0f);
-    glutWireTeapot(0.5);
-
-
-
-    // Draw solid cone
-    glColor3f(0.0f, 0.0f, 0.7f);
-    glTranslatef(2.0f ,0.0f, 0.0f);
-    glutSolidCone(1, 1, 6, 6);
-    */
 
     glutSwapBuffers();
     glutPostRedisplay();
@@ -501,7 +499,7 @@ void GameEngine::setupMap()
     // Floor
     objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 0.1f, 30.0f, 0.f, 1.f, 0.f, textures["wood"]));
 
-    //objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
+    objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
 
     objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
 
@@ -512,19 +510,22 @@ void GameEngine::setupMap()
     objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
 
     // Walls
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
 
     // Middle wall
-    objects.push_back(std::make_shared<TexturedCube>(-20.0f ,1.0f, 0.0f, 0.3f, 10.0f, 2.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(-20.0f ,1.0f, 0.0f, 0.3f, 10.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
 
     // Objects
     objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
     objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
     objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
     objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
+
+    // NPCs
+    objects.push_back(std::make_shared<NPC>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
 }
 
 void GameEngine::setupNpcs()
@@ -657,6 +658,15 @@ void GameEngine::setupGrid()
     }
 }
 
+void GameEngine::setupMainMenu()
+{
+    mainMenuToggle = true;
+    mainMenuSelectedItem = 0;
+    mainMenu.push_back("Play game");
+    mainMenu.push_back("Settings");
+    mainMenu.push_back("Exit");
+}
+
 void GameEngine::run(int argc, char** argv)
 {
     glutInit(&argc,argv);
@@ -668,19 +678,19 @@ void GameEngine::run(int argc, char** argv)
     {
         return;
     }
+    setupMainMenu();
     setupMap();
     setupMapData();
     setupNpcs();
     setupGrid();
     glutDisplayFunc(draw);
     glutReshapeFunc(reshape);
-    //glutKeyboardFunc(keyboard);
-    //glutSpecialFunc(pressKey);
-    glutSpecialFunc(processSpecialKeys);
     glutIgnoreKeyRepeat(1);
-    glutSpecialFunc(pressKey);
-    glutIgnoreKeyRepeat(1);
-    glutSpecialUpFunc(releaseKey);
+    //glutSpecialFunc(pressKey);dddd
+    //glutSpecialUpFunc(releaseKey);
+    glutKeyboardUpFunc(keyUp);
+    //glutSpecialFunc(processSpecialKeys);
+    glutKeyboardFunc(processNormalKeys);
     glutMainLoop();
 }
 
@@ -715,34 +725,71 @@ void GameEngine::checkSDLError(int line)
 
 void GameEngine::processSpecialKeys(int key, int xx, int yy)
 {
-    /*std::cout << "Angle: " << angle << "Lx: " << lx << "Lz: " << lz << std::endl;
+    if (mainMenuToggle)
+    {
+        switch (key) {
+            case GLUT_KEY_DOWN:
+                if (mainMenuSelectedItem < mainMenu.size()-1)
+                {
+                    mainMenuSelectedItem++;
+                }
+                break;
+            case GLUT_KEY_UP:
+                if (mainMenuSelectedItem > 0)
+                {
+                    mainMenuSelectedItem--;
+                }
+                break;
+        }
+    }
+}
 
-    float fraction = 0.1f;
+void GameEngine::processNormalKeys(unsigned char key, int x, int y)
+{
+    if (mainMenuToggle)
+    {
+        switch (key)
+        {
+            case 13:    // Enter
+                if (mainMenuSelectedItem == 0) // Play game menu item
+                    mainMenuToggle = false;
+                if (mainMenuSelectedItem == 2) // Exit game
+                    exit(0);
+                break;
+            case 119:
+                if (mainMenuSelectedItem > 0)
+                {
+                    mainMenuSelectedItem--;
+                }
+            break;
+        case 115:
+            if (mainMenuSelectedItem < mainMenu.size()-1)
+            {
+                mainMenuSelectedItem++;
+            }
+            break;
+        }
+        return;
+    }
     switch (key) {
-        case GLUT_KEY_LEFT :
-            angle -= 0.05f;
-            lx = sin(angle);
-            lz = -cos(angle);
+        case 27:    // Esc
+            mainMenuToggle = true;
             break;
-        case GLUT_KEY_RIGHT :
-            angle += 0.05f;
-            lx = sin(angle);
-            lz = -cos(angle);
-            break;
-        case GLUT_KEY_UP :
-            x += lx * fraction;
-            z += lz * fraction;
-            break;
-        case GLUT_KEY_DOWN :
-            x -= lx * fraction;
-            z -= lz * fraction;
-            break;
-    }*/
+    }
+    switch (key) {
+        case 'w' : deltaMove = forwardMovementSpeed; break;
+        case 'a' : deltaAngle = -leftRightMovementSpeed; break;
+        case 's' : deltaMove = -forwardMovementSpeed; break;
+        case 'd' : deltaAngle = leftRightMovementSpeed; break;
+    }
 }
 
 void GameEngine::pressKey(int key, int xx, int yy)
 {
-
+    if (mainMenuToggle)
+    {
+        return;
+    }
     switch (key) {
         case GLUT_KEY_LEFT : deltaAngle = -leftRightMovementSpeed; break;
         case GLUT_KEY_RIGHT : deltaAngle = leftRightMovementSpeed; break;
@@ -753,13 +800,35 @@ void GameEngine::pressKey(int key, int xx, int yy)
 
 void GameEngine::releaseKey(int key, int x, int y)
 {
-
-    switch (key) {
+    if (mainMenuToggle)
+    {
+        return;
+    }
+    /*switch (key) {
         case GLUT_KEY_LEFT :
         case GLUT_KEY_RIGHT : deltaAngle = 0.0f; break;
         case GLUT_KEY_UP :
         case GLUT_KEY_DOWN : deltaMove = 0; break;
+    }*/
+}
+
+void GameEngine::keyUp(unsigned char key, int x, int y)
+{
+    if (mainMenuToggle)
+    {
+        return;
     }
+    switch (key) {
+        case 'a' :
+        case 'd' : deltaAngle = 0.0f; break;
+        case 'w' :
+        case 's' : deltaMove = 0; break;
+    }
+}
+
+void GameEngine::keyDown(unsigned char key, int x, int y)
+{
+
 }
 
 void GameEngine::computePos(float deltaMove)
@@ -935,7 +1004,7 @@ SDL_GLContext GameEngine::ctx;
 SDL_Window* GameEngine::window;
 
 std::vector<std::shared_ptr<Object>> GameEngine::objects;
-std::vector<std::shared_ptr<NPC>> GameEngine::npcs;
+std::vector<std::shared_ptr<Object>> GameEngine::npcs;
 std::vector<std::shared_ptr<Object>> GameEngine::gridCollisionFloor;
 std::vector<std::shared_ptr<Object>> GameEngine::pathfinderPaths;
 
@@ -956,6 +1025,10 @@ float GameEngine::forwardMovementSpeed = 0.8f;
 float GameEngine::leftRightMovementSpeed = 0.1f;
 
 std::unordered_map<std::string, std::shared_ptr<Texture>> GameEngine::textures;
+
+std::vector<std::string> GameEngine::mainMenu;
+bool GameEngine::mainMenuToggle;
+int GameEngine::mainMenuSelectedItem;
 
 int GameEngine::grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
 

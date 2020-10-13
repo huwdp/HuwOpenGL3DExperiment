@@ -6,10 +6,12 @@ LIBS += -lGL -lSDL2 -std=c++11 -lGLU -lGL -lGLU -lglut
 
 SOURCES += \
     GameEngine/ai/gridnode.cpp \
-    GameEngine/npc.cpp \
+    GameEngine/objects/cone.cpp \
     GameEngine/objects/cube.cpp \
     GameEngine/objects/floor.cpp \
+    GameEngine/objects/npc.cpp \
     GameEngine/objects/object.cpp \
+    GameEngine/objects/sphere.cpp \
     GameEngine/objects/texturedcube.cpp \
     GameEngine/texture.cpp \
         main.cpp \
@@ -20,10 +22,12 @@ SOURCES += \
 HEADERS += \
     GameEngine/ai/gridnode.h \
     GameEngine/gameengine.h \
-    GameEngine/npc.h \
+    GameEngine/objects/cone.h \
     GameEngine/objects/cube.h \
     GameEngine/objects/floor.h \
+    GameEngine/objects/npc.h \
     GameEngine/objects/object.h \
+    GameEngine/objects/sphere.h \
     GameEngine/objects/texturedcube.h \
     GameEngine/player.h \
     GameEngine/coord.h \

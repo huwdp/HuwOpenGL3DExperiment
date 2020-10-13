@@ -17,7 +17,7 @@
 #include <GL/glut.h>
 
 #include "objects/object.h"
-#include "npc.h"
+#include "objects/npc.h"
 #include "ai/gridnode.h"
 
 #include "texture.h"
@@ -37,13 +37,23 @@ public:
     static int viewDistance;
 
     static std::vector<std::shared_ptr<Object>> objects;
-    static std::vector<std::shared_ptr<NPC>> npcs;
+    static std::vector<std::shared_ptr<Object>> npcs;
     static std::vector<std::shared_ptr<Object>> gridCollisionFloor;
     static std::vector<std::shared_ptr<Object>> pathfinderPaths;
+
+    static std::vector<std::string> mainMenu;
+    static bool mainMenuToggle;
+    static int mainMenuSelectedItem;
 
     static void checkSDLError(int line = -1);
     static void printSDLGLAttributes();
     static bool setOpenGLAttributes();
+
+    static void renderBitmapString(float x,
+        float y,
+        float z,
+        void *font,
+        char *string);
 
     static float angle;
     static float lx,lz;
@@ -83,9 +93,12 @@ public:
 
 
 
+
+
     static void setupMap();
     static void setupMapData();
     static void setupNpcs();
+    static void setupMainMenu();
 
     // Pathfinding
     static void setupGrid();
@@ -110,6 +123,9 @@ public:
     static void pressKey(int key, int xx, int yy);
     static void releaseKey(int key, int x, int y);
     static void processSpecialKeys(int key, int xx, int yy);
+    static void processNormalKeys(unsigned char key, int x, int y);
+    static void keyUp(unsigned char key, int x, int y);
+    static void keyDown(unsigned char key, int x, int y);
 
     // Helper methods
     static float toRadians(float degrees);
