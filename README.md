@@ -14,7 +14,7 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  - ~~Object collision~~
  - Cubemap
  - Tree
- - Basic 3D collision
+ - ~~Basic 3D collision~~
  - Picture frames
  - Software Culling
  - Game intro
@@ -23,7 +23,7 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  - Fun
  - Better texture format
  - AI
- - Pathfinding
+ - ~~Pathfinding~~
  - WASD
  - Mouse control
 
