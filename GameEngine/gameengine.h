@@ -1,6 +1,8 @@
 #ifndef GAMEENGINE_H
 #define GAMEENGINE_H
 
+#include "defines.h"
+
 #include <memory>
 #include <iostream>
 #include <vector>
@@ -20,14 +22,13 @@
 #include "objects/npc.h"
 #include "ai/gridnode.h"
 
+#include "ai/ainpc.h"
+
 #include "texture.h"
 
 class GameEngine
 {
 public:
-    static const int GRID_MAP_WIDTH = 30;
-    static const int GRID_MAP_HEIGHT = 30;
-
     static SDL_GLContext mainContext;
     static SDL_Window *mainWindow;
     static std::string programName;
@@ -37,7 +38,7 @@ public:
     static int viewDistance;
 
     static std::vector<std::shared_ptr<Object>> objects;
-    static std::vector<std::shared_ptr<Object>> npcs;
+    static std::vector<std::shared_ptr<AINPC>> npcs;
     static std::vector<std::shared_ptr<Object>> gridCollisionFloor;
     static std::vector<std::shared_ptr<Object>> pathfinderPaths;
 
@@ -64,7 +65,6 @@ public:
     static float leftRightMovementSpeed;
     static int grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
     static int pathfindingGridCache[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
-    static int pathfindingGrid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
 
     static SDL_GLContext ctx;
     static SDL_Window* window;
@@ -92,7 +92,7 @@ public:
     static void test();
 
 
-
+    static void ai();
 
 
     static void setupMap();
@@ -102,10 +102,7 @@ public:
 
     // Pathfinding
     static void setupGrid();
-    static std::vector<std::shared_ptr<GridNode>> generatePath(int startX, int startY, int endX, int endY);
-    static void pathfinder();
     static int lastPlayerGridX, lastPlayerGridY;
-    static const int MAX_LIMIT = 20000; // Max pathfinding iterations
 
     // User settings
     static int getWidth();

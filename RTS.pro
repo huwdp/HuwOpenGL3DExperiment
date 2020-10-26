@@ -5,7 +5,10 @@ CONFIG -= qt
 LIBS += -lGL -lSDL2 -std=c++11 -lGLU -lGL -lGLU -lglut
 
 SOURCES += \
+    GameEngine/ai/enemynpc.cpp \
+    GameEngine/ai/friendlynpc.cpp \
     GameEngine/ai/gridnode.cpp \
+    GameEngine/ai/pathfinder.cpp \
     GameEngine/objects/cone.cpp \
     GameEngine/objects/cube.cpp \
     GameEngine/objects/floor.cpp \
@@ -20,7 +23,11 @@ SOURCES += \
     GameEngine/coord.cpp
 
 HEADERS += \
+    GameEngine/ai/ainpc.h \
+    GameEngine/ai/enemynpc.h \
+    GameEngine/ai/friendlynpc.h \
     GameEngine/ai/gridnode.h \
+    GameEngine/ai/pathfinder.h \
     GameEngine/gameengine.h \
     GameEngine/objects/cone.h \
     GameEngine/objects/cube.h \
@@ -31,7 +38,8 @@ HEADERS += \
     GameEngine/objects/texturedcube.h \
     GameEngine/player.h \
     GameEngine/coord.h \
-    GameEngine/texture.h
+    GameEngine/texture.h \
+    defines.h
 
 DISTFILES += \
     LICENSE \

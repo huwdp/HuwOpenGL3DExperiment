@@ -20,6 +20,10 @@
 
 #include "ai/gridnode.h"
 
+#include "ai/enemynpc.h"
+
+#include "ai/pathfinder.h"
+
 void GameEngine::init()
 {
     loop = true;
@@ -90,14 +94,14 @@ void GameEngine::init()
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_position[] = { 1.0, 3.0, 1.0, 0.0 };
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    //glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    //glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    //glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     // Setup the materials for LIGHT0
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiff);
+    //glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
+    //glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiff);
 
     // Now setup LIGHT0
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
@@ -134,267 +138,6 @@ void GameEngine::reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
-void GameEngine::pathfinder()
-{
-    //std::vector<std::shared_ptr<GridNode>> path = generatePath(30, 26, 0, 0);
-
-    //int xx = ((x-mostLeft)/2);
-    //int yy = ((z-mostTop)/2);
-
-    int xx = x3DOpenGLGridTo2dGrid(x);
-    int yy = y3DOpenGLGridTo2dGrid(z);
-
-    //std::cout << x << ":" << z << std::endl;
-    //std::cout << mostLeft << ":" << mostTop << std::endl;
-    //std::cout << xx << ":" << yy << std::endl;
-
-    std::vector<std::shared_ptr<GridNode>> path = generatePath(15, 15, xx, yy);
-    //std::vector<std::shared_ptr<GridNode>> path = generatePath(0, 0, 50, 0);
-    pathfinderPaths.clear();
-    for (auto it = path.begin(); it != path.end(); ++it)
-    {
-        std::shared_ptr<GridNode> gNode = (*it);
-        //float xFloor = (gNode->x*gridBlockWidth)-(mapWidth/2);
-        //float zFloor = (gNode->y*gridBlockHeight)-(mapHeight/2);
-        pathfinderPaths.push_back(std::make_shared<Floor>(x2DGridTo3DOpenGLGrid(gNode->x),
-                                                          -0.9f,
-                                                          y2DGridTo3DOpenGLGrid(gNode->y),
-                                                          gridBlockWidth/2,
-                                                          0.1f,
-                                                          gridBlockHeight/2,
-                                                          0.f,
-                                                          1.f,
-                                                          0.f,
-                                                          textures["wallpaper"]));
-    }
-}
-
-std::vector<std::shared_ptr<GridNode>> GameEngine::generatePath(int startX, int startY, int endX, int endY)
-{
-    std::vector<std::shared_ptr<GridNode>> path;
-    std::vector<std::shared_ptr<GridNode>> emptyPath;
-
-    // Optimisation - If user is outside of the map
-    // then don't bother to run pathfinding
-    if (startX > GRID_MAP_WIDTH
-            || startX < 0
-            || startY > GRID_MAP_HEIGHT
-            || startY < 0)
-    {
-        return path;
-    }
-
-    // Optimisation - No need to compute shortest path if coordinates are the same
-    if (startX == endX && startY == endY)
-    {
-        return path;
-    }
-
-    // Clear pathfinding grid
-    for (int i = 0; i < GRID_MAP_WIDTH; ++i)
-    {
-        for (int j = 0; j < GRID_MAP_WIDTH; ++j)
-        {
-            pathfindingGrid[i][j] = -1;
-        }
-    }
-
-    int count = 0;
-    int cost = 0;
-    bool found = false;
-    std::queue<std::shared_ptr<GridNode>> gridQueue;  // Convert to priority queue for better performance
-    gridQueue.push(std::make_shared<GridNode>(startX, startY));
-    pathfindingGrid[startX][startY] = cost;
-
-    while (!gridQueue.empty() && !found && count < MAX_LIMIT)
-    {
-        std::shared_ptr<GridNode> node2 = gridQueue.front();
-        if (node2->x == endX && node2->y == endY)
-        {
-            found = true;
-            break;
-        }
-
-        cost++;
-
-        std::queue<std::shared_ptr<GridNode>> neighbourQueue;
-
-        while (!gridQueue.empty())
-        {
-            neighbourQueue.push(gridQueue.front());
-            gridQueue.pop();
-        }
-
-        while (!neighbourQueue.empty() && !found && count < MAX_LIMIT)
-        {
-            std::shared_ptr<GridNode> node = neighbourQueue.front();
-
-            if (node->x == endX && node->y == endY)
-            {
-                found = true;
-                break;
-            }
-
-            neighbourQueue.pop();
-
-            if (node->x > 0) //maybe this should be 1
-            {
-                int xx = (node->x)-1;
-                int yy = (node->y);
-                if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
-                {
-                    pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
-                }
-            }
-
-            if (node->x < GRID_MAP_WIDTH)
-            {
-                int xx = (node->x)+1;
-                int yy = (node->y);
-                if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
-                {
-                    pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
-                }
-            }
-
-            if (node->y > 1)
-            {
-                int xx = (node->x);
-                int yy = (node->y)-1;
-                if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
-                {
-                    pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
-                }
-            }
-
-            if (node->y < GRID_MAP_HEIGHT)
-            {
-                int xx = (node->x);
-                int yy = (node->y)+1;
-                if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
-                {
-                    pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
-                }
-            }
-
-            if (node->x == endX && node->y == endY)
-            {
-                found = true;
-            }
-
-            while (!neighbourQueue.empty())
-            {
-                gridQueue.push(neighbourQueue.front());
-                neighbourQueue.pop();
-            }
-        }
-        ++count;
-    }
-
-    // Debug code
-    /*for (int i = 0; i < GRID_MAP_WIDTH; ++i)
-    {
-        for (int j = 0; j < GRID_MAP_HEIGHT; ++j)
-        {
-            std::cout << std::to_string(pathfindingGrid[i][j]);
-            if (i == endX && j == endY)
-            {
-                std::cout << "x";
-            }
-            std::cout << ",";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;*/
-
-    if (!found)
-    {
-        return emptyPath;
-    }
-
-    pathfindingGrid[endX][endY] = cost++;
-    path.push_back(std::make_shared<GridNode>(endX,endY));
-
-    int bestXGNode = endX;
-    int bestYGNode = endY;
-
-    count = 0;
-    found = false;
-
-    while (!found && count < MAX_LIMIT)
-    {
-        int tempX = bestXGNode;
-        int tempY = bestYGNode;
-
-        if (bestXGNode > 0)
-        {
-            int currentGridItem = pathfindingGrid[bestXGNode][bestYGNode];
-            int compareToGridItem = pathfindingGrid[bestXGNode-1][bestYGNode];
-            if (compareToGridItem < currentGridItem
-                    && compareToGridItem != -1)
-            {
-                bestXGNode = bestXGNode-1;
-                bestYGNode = bestYGNode;
-            }
-        }
-        if (bestXGNode < GRID_MAP_WIDTH)
-        {
-            int currentGridItem = pathfindingGrid[bestXGNode][bestYGNode];
-            int compareToGridItem = pathfindingGrid[bestXGNode+1][bestYGNode];
-            if (compareToGridItem < currentGridItem
-                    && compareToGridItem != -1)
-            {
-                bestXGNode = bestXGNode+1;
-                bestYGNode = bestYGNode;
-            }
-        }
-
-        if (bestYGNode > 0)
-        {
-            int currentGridItem = pathfindingGrid[bestXGNode][bestYGNode];
-            int compareToGridItem = pathfindingGrid[bestXGNode][bestYGNode-1];
-            if (compareToGridItem < currentGridItem
-                    && compareToGridItem != -1)
-            {
-                bestXGNode = bestXGNode;
-                bestYGNode = bestYGNode-1;
-            }
-        }
-        if (bestYGNode < GRID_MAP_HEIGHT)
-        {
-            int currentGridItem = pathfindingGrid[bestXGNode][bestYGNode];
-            int compareToGridItem = pathfindingGrid[bestXGNode][bestYGNode+1];
-            if (compareToGridItem < currentGridItem
-                    && compareToGridItem != -1)
-            {
-                bestXGNode = bestXGNode;
-                bestYGNode = bestYGNode+1;
-            }
-        }
-
-        if (bestXGNode == startX && bestYGNode == startY)
-        {
-            found = true;
-            break;
-        }
-
-        // Bailout if haven't moved grid block
-        if (tempX == bestXGNode && tempY == bestYGNode)
-        {
-            return emptyPath;
-        }
-
-        path.push_back(std::make_shared<GridNode>(bestXGNode,bestYGNode));
-        ++count;
-    }
-    std::reverse(std::begin(path), std::end(path));
-    return path;
-}
-
 void GameEngine::renderBitmapString(
     float x,
     float y,
@@ -416,6 +159,9 @@ void GameEngine::draw()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
+
+    // Run AI
+    ai();
 
     // Reset transformations
     glLoadIdentity();
@@ -454,6 +200,13 @@ void GameEngine::draw()
 
     // Draw objects
     for (auto it = objects.begin(); it != objects.end(); ++it)
+    {
+        //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        (*it)->draw();
+    }
+
+    // Draw NPCs
+    for (auto it = npcs.begin(); it != npcs.end(); ++it)
     {
         //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
         (*it)->draw();
@@ -499,15 +252,7 @@ void GameEngine::setupMap()
     // Floor
     objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 0.1f, 30.0f, 0.f, 1.f, 0.f, textures["wood"]));
 
-    objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
 
-    objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-
-    objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
-
-    objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
 
     // Walls
     objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
@@ -519,13 +264,20 @@ void GameEngine::setupMap()
     objects.push_back(std::make_shared<TexturedCube>(-20.0f ,1.0f, 0.0f, 0.3f, 10.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
 
     // Objects
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
 
     // NPCs
-    objects.push_back(std::make_shared<NPC>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
+    npcs.push_back(std::make_shared<EnemyNPC>("Troll", 10.0f ,0.5f, 10.0f));
+    npcs.push_back(std::make_shared<EnemyNPC>("Troll", 20.0f ,0.5f, -10.0f));
 }
 
 void GameEngine::setupNpcs()
@@ -654,6 +406,49 @@ void GameEngine::setupGrid()
                                                                      0.f,
                                                                      textures["wallpaper"]));
             }
+        }
+    }
+}
+
+void GameEngine::ai()
+{
+    // Recalculate gridWidth and gridHeight
+    pathfinderPaths.clear();
+    for (auto it = npcs.begin(); it != npcs.end(); ++it)
+    {
+        auto npc = (*it);
+        if (x > npc->x - 20 && x < npc->x+20
+                && npc->y > npc->y - 20 && npc->y < npc->y+20)
+        {
+            npc->onAlert = true;
+        }
+        else
+        {
+            npc->onAlert = false;
+        }
+
+        int xx = x3DOpenGLGridTo2dGrid(x);
+        int yy = y3DOpenGLGridTo2dGrid(z);
+
+        int npcX = x3DOpenGLGridTo2dGrid(npc->x);
+        int npcZ = y3DOpenGLGridTo2dGrid(npc->z);
+
+        std::vector<std::shared_ptr<GridNode>> path = Pathfinder::generatePath(grid, npcX, npcZ, xx, yy);
+
+        for (auto it = path.begin(); it != path.end(); ++it)
+        {
+            std::shared_ptr<GridNode> gNode = (*it);
+            int bob = x2DGridTo3DOpenGLGrid(gNode->x);
+            pathfinderPaths.push_back(std::make_shared<Floor>(bob,
+                                                              -0.9f,
+                                                              y2DGridTo3DOpenGLGrid(gNode->y),
+                                                              gridBlockWidth/2,
+                                                              0.1f,
+                                                              gridBlockHeight/2,
+                                                              0.f,
+                                                              1.f,
+                                                              0.f,
+                                                              textures["wallpaper"]));
         }
     }
 }
@@ -885,7 +680,7 @@ void GameEngine::movement()
 
     if (oldX != x || oldZ != z)
     {
-        pathfinder();
+        //pathfinder();
     }
 
     if (collision)
@@ -1004,7 +799,7 @@ SDL_GLContext GameEngine::ctx;
 SDL_Window* GameEngine::window;
 
 std::vector<std::shared_ptr<Object>> GameEngine::objects;
-std::vector<std::shared_ptr<Object>> GameEngine::npcs;
+std::vector<std::shared_ptr<AINPC>> GameEngine::npcs;
 std::vector<std::shared_ptr<Object>> GameEngine::gridCollisionFloor;
 std::vector<std::shared_ptr<Object>> GameEngine::pathfinderPaths;
 
@@ -1032,7 +827,6 @@ int GameEngine::mainMenuSelectedItem;
 
 int GameEngine::grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
 
-int GameEngine::pathfindingGrid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
 int GameEngine::lastPlayerGridX = 0;
 int GameEngine::lastPlayerGridY = 0;
 float GameEngine::mostTop;
@@ -1041,5 +835,5 @@ float GameEngine::mostLeft;
 float GameEngine::mostRight;
 float GameEngine::mapWidth;
 float GameEngine::mapHeight;
-float GameEngine::gridBlockWidth;
-float GameEngine::gridBlockHeight;
+float GameEngine::gridBlockWidth = 1;
+float GameEngine::gridBlockHeight = 1;
