@@ -5,6 +5,7 @@ CONFIG -= qt
 LIBS += -lGL -lSDL2 -std=c++11 -lGLU -lGL -lGLU -lglut
 
 SOURCES += \
+    GameEngine/ai/characterai.cpp \
     GameEngine/ai/enemynpc.cpp \
     GameEngine/ai/friendlynpc.cpp \
     GameEngine/ai/gridnode.cpp \
@@ -23,7 +24,9 @@ SOURCES += \
     GameEngine/coord.cpp
 
 HEADERS += \
+    GameEngine/ai/Enums.h \
     GameEngine/ai/ainpc.h \
+    GameEngine/ai/characterai.h \
     GameEngine/ai/enemynpc.h \
     GameEngine/ai/friendlynpc.h \
     GameEngine/ai/gridnode.h \

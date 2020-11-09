@@ -58,13 +58,14 @@ public:
 
     static float angle;
     static float lx,lz;
-    static float x, z;
+    static float x, z, y;
     static float deltaAngle;
     static float deltaMove;
     static float forwardMovementSpeed;
     static float leftRightMovementSpeed;
     static int grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
     static int pathfindingGridCache[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
+    static bool jump;
 
     static SDL_GLContext ctx;
     static SDL_Window* window;
@@ -94,7 +95,7 @@ public:
 
     static void ai();
 
-
+    static void setupPlayer();
     static void setupMap();
     static void setupMapData();
     static void setupNpcs();
@@ -120,7 +121,7 @@ public:
     static void pressKey(int key, int xx, int yy);
     static void releaseKey(int key, int x, int y);
     static void processSpecialKeys(int key, int xx, int yy);
-    static void processNormalKeys(unsigned char key, int x, int y);
+    static void processNormalKeys(unsigned char key, int xx, int yy);
     static void keyUp(unsigned char key, int x, int y);
     static void keyDown(unsigned char key, int x, int y);
 

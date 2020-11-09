@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "Enums.h"
 
 class AINPC
 {
@@ -13,6 +14,8 @@ public:
     float y;
     float z;
     bool onAlert = false;
+    bool friendly = true;
+    AIState state = AIState::IDLE;
     AINPC(std::string name, float x, float y, float z)
     {
         this->name = name;

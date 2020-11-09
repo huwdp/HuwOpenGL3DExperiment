@@ -155,6 +155,7 @@ void GameEngine::renderBitmapString(
 
 void GameEngine::draw()
 {
+    runPhysics();
     movement();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -196,7 +197,7 @@ void GameEngine::draw()
 
 
     // Set the camera
-    gluLookAt(x, 1.0f, z, x+lx, 1.0f,  z+lz, 0.0f, 1.5f,  0.0f);
+    gluLookAt(x, y, z, x+lx, y,  z+lz, 0.0f, 1.5f,  0.0f);
 
     // Draw objects
     for (auto it = objects.begin(); it != objects.end(); ++it)
@@ -264,20 +265,26 @@ void GameEngine::setupMap()
     objects.push_back(std::make_shared<TexturedCube>(-20.0f ,1.0f, 0.0f, 0.3f, 10.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
 
     // Objects
-    //objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
-    //objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
-    //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
-    //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
-    //objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
-    //objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    //objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
-    //objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
-    //objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
-    //objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
+    objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
+    objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
+    objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
+    objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
+    objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
 
     // NPCs
     npcs.push_back(std::make_shared<EnemyNPC>("Troll", 10.0f ,0.5f, 10.0f));
     npcs.push_back(std::make_shared<EnemyNPC>("Troll", 20.0f ,0.5f, -10.0f));
+}
+
+void GameEngine::setupPlayer()
+{
+    // Set player camera height
+    y = 1.5f;
 }
 
 void GameEngine::setupNpcs()
@@ -417,38 +424,37 @@ void GameEngine::ai()
     for (auto it = npcs.begin(); it != npcs.end(); ++it)
     {
         auto npc = (*it);
-        if (x > npc->x - 20 && x < npc->x+20
-                && npc->y > npc->y - 20 && npc->y < npc->y+20)
+        if (x > npc->x - 5 && x < npc->x+5
+                && npc->z > npc->z - 5 && npc->z < npc->z+5)
         {
             npc->onAlert = true;
+            int xx = x3DOpenGLGridTo2dGrid(x);
+            int yy = y3DOpenGLGridTo2dGrid(z);
+
+            int npcX = x3DOpenGLGridTo2dGrid(npc->x);
+            int npcZ = y3DOpenGLGridTo2dGrid(npc->z);
+
+            std::vector<std::shared_ptr<GridNode>> path = Pathfinder::generatePath(grid, npcX, npcZ, xx, yy);
+
+            for (auto it = path.begin(); it != path.end(); ++it)
+            {
+                std::shared_ptr<GridNode> gNode = (*it);
+                int bob = x2DGridTo3DOpenGLGrid(gNode->x);
+                pathfinderPaths.push_back(std::make_shared<Floor>(bob,
+                                                                  -0.9f,
+                                                                  y2DGridTo3DOpenGLGrid(gNode->y),
+                                                                  gridBlockWidth/2,
+                                                                  0.1f,
+                                                                  gridBlockHeight/2,
+                                                                  0.f,
+                                                                  1.f,
+                                                                  0.f,
+                                                                  textures["wallpaper"]));
+            }
         }
         else
         {
             npc->onAlert = false;
-        }
-
-        int xx = x3DOpenGLGridTo2dGrid(x);
-        int yy = y3DOpenGLGridTo2dGrid(z);
-
-        int npcX = x3DOpenGLGridTo2dGrid(npc->x);
-        int npcZ = y3DOpenGLGridTo2dGrid(npc->z);
-
-        std::vector<std::shared_ptr<GridNode>> path = Pathfinder::generatePath(grid, npcX, npcZ, xx, yy);
-
-        for (auto it = path.begin(); it != path.end(); ++it)
-        {
-            std::shared_ptr<GridNode> gNode = (*it);
-            int bob = x2DGridTo3DOpenGLGrid(gNode->x);
-            pathfinderPaths.push_back(std::make_shared<Floor>(bob,
-                                                              -0.9f,
-                                                              y2DGridTo3DOpenGLGrid(gNode->y),
-                                                              gridBlockWidth/2,
-                                                              0.1f,
-                                                              gridBlockHeight/2,
-                                                              0.f,
-                                                              1.f,
-                                                              0.f,
-                                                              textures["wallpaper"]));
         }
     }
 }
@@ -473,6 +479,7 @@ void GameEngine::run(int argc, char** argv)
     {
         return;
     }
+    setupPlayer();
     setupMainMenu();
     setupMap();
     setupMapData();
@@ -501,6 +508,26 @@ void GameEngine::cleanUp()
 
 void GameEngine::runPhysics()
 {
+    // 1.5 is player height
+    if (jump)
+    {
+        if (y >= 3.0f) // Player max jump
+        {
+            jump = false;
+        }
+        y = y + 0.08f;
+    }
+    else
+    {
+        if (y > 1.5f)
+        {
+            y = y - 0.1f;
+            if (y < 1.5f)
+            {
+                y = 1.5f;
+            }
+        }
+    }
 }
 
 void GameEngine::checkSDLError(int line)
@@ -539,7 +566,7 @@ void GameEngine::processSpecialKeys(int key, int xx, int yy)
     }
 }
 
-void GameEngine::processNormalKeys(unsigned char key, int x, int y)
+void GameEngine::processNormalKeys(unsigned char key, int xx, int yy)
 {
     if (mainMenuToggle)
     {
@@ -576,6 +603,12 @@ void GameEngine::processNormalKeys(unsigned char key, int x, int y)
         case 'a' : deltaAngle = -leftRightMovementSpeed; break;
         case 's' : deltaMove = -forwardMovementSpeed; break;
         case 'd' : deltaAngle = leftRightMovementSpeed; break;
+        case ' ' :
+            if (y == 1.5) // player height
+            {
+                jump = true;
+            }
+        break;
     }
 }
 
@@ -813,11 +846,13 @@ float GameEngine::angle = 0.0f;
 float GameEngine::lx=0.0f;
 float GameEngine::lz=-1.0f;
 float GameEngine::x=0.0f;
+float GameEngine::y=1.0f;
 float GameEngine::z=5.0f;
 float GameEngine::deltaAngle = 0.0f;
 float GameEngine::deltaMove = 0;
 float GameEngine::forwardMovementSpeed = 0.8f;
 float GameEngine::leftRightMovementSpeed = 0.1f;
+bool GameEngine::jump = false;
 
 std::unordered_map<std::string, std::shared_ptr<Texture>> GameEngine::textures;
 
