@@ -17,6 +17,7 @@
 #include "objects/cube.h"
 #include "objects/texturedcube.h"
 #include "objects/floor.h"
+#include "objects/skybox.h"
 
 #include "ai/gridnode.h"
 
@@ -35,7 +36,7 @@ void GameEngine::init()
 
     glEnable(GL_LINE_SMOOTH);           // Smooth lines
     glEnable(GL_POINT_SMOOTH);          // Smoooth points
-    glEnable(GL_CULL_FACE);           // Culling
+    //glEnable(GL_CULL_FACE);           // Culling
     glHint(GL_LINE_SMOOTH, GL_NICEST);  // Smooth lines - Is this needed?
     glHint(GL_POINT_SMOOTH, GL_NICEST); // Smoooth points - Is this needed?
 
@@ -132,7 +133,7 @@ void GameEngine::reshape(int w, int h)
     glViewport(0, 0, w, h);
 
     // Set the correct perspective.
-    gluPerspective(fov,ratio,1,100);
+    gluPerspective(fov,ratio,1,250);
 
     // Get Back to the Modelview
     glMatrixMode(GL_MODELVIEW);
@@ -159,7 +160,7 @@ void GameEngine::draw()
     movement();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     // Run AI
     ai();
@@ -193,37 +194,42 @@ void GameEngine::draw()
         glutPostRedisplay();
         return;
     }
+    glClearColor(0.f, 0.f, 0.f, 0.f);
 
 
 
     // Set the camera
     gluLookAt(x, y, z, x+lx, y,  z+lz, 0.0f, 1.5f,  0.0f);
 
+    // Draw skybox
+    auto skyBox = std::make_shared<SkyBox>(0.0f , 0.0f, 0.0f, 100.0f, 100.0f, 100.0f, 1.f, 1.f, 1.f, textures["sky"]);
+    skyBox->draw();
+
     // Draw objects
     for (auto it = objects.begin(); it != objects.end(); ++it)
     {
-        //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        glColor3f(1.0f, 1.0f, 1.0f); // Reset color
         (*it)->draw();
     }
 
     // Draw NPCs
     for (auto it = npcs.begin(); it != npcs.end(); ++it)
     {
-        //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        glColor3f(1.0f, 1.0f, 1.0f); // Reset color
         (*it)->draw();
     }
 
     // Draw grid floor collisions
     for (auto it = gridCollisionFloor.begin(); it != gridCollisionFloor.end(); ++it)
     {
-        //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        glColor3f(1.0f, 1.0f, 1.0f); // Reset color
         (*it)->draw();
     }
 
     // Draw shortest path
     for (auto it = pathfinderPaths.begin(); it != pathfinderPaths.end(); ++it)
     {
-        //glColor3f(1.0f, 1.0f, 1.0f); // Reset color
+        glColor3f(1.0f, 1.0f, 1.0f); // Reset color
         (*it)->draw();
     }
 
@@ -233,8 +239,10 @@ void GameEngine::draw()
 
 bool GameEngine::assets()
 {
-    textures["wood"] = std::make_shared<Texture>("textures/wood.bmp");
+    textures["wood"] = std::make_shared<Texture>("textures/wood2.bmp");
     textures["wallpaper"] = std::make_shared<Texture>("textures/wall.bmp");
+    textures["sky"] = std::make_shared<Texture>("textures/sky.bmp");
+    textures["brick"] = std::make_shared<Texture>("textures/brick.bmp");
 
     /*for (std::unordered_map<std::string, std::make_shared<Texture>>::iterator it = textures.begin(); it != textures.end(); ++it)
     {
@@ -251,15 +259,15 @@ bool GameEngine::assets()
 void GameEngine::setupMap()
 {
     // Floor
-    objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 0.1f, 30.0f, 0.f, 1.f, 0.f, textures["wood"]));
+    objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 0.1f, 30.0f, 0.f, 0.f, 0.f, textures["wood"]));
 
 
 
     // Walls
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, 30.0f, 30.0f, 1.0f, 3.0f, 1.f, 1.f, 1.f, textures["brick"]));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,1.0f, -30.0f, 30.0f, 0.3f, 3.0f, 1.f, 1.f, 1.f, textures["brick"]));
+    objects.push_back(std::make_shared<TexturedCube>(30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 3.0f, 1.f, 1.f, 1.f, textures["brick"]));
+    objects.push_back(std::make_shared<TexturedCube>(-30.0f ,1.0f, 0.0f, 0.3f, 30.0f, 3.0f, 1.f, 1.f, 1.f, textures["brick"]));
 
     // Middle wall
     objects.push_back(std::make_shared<TexturedCube>(-20.0f ,1.0f, 0.0f, 0.3f, 10.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));

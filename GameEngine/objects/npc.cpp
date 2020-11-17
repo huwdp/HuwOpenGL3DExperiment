@@ -16,7 +16,7 @@ void NPC::draw()
     float width = 1;
     float height = 1;
 
-    glColor3f(1.0f, 0.0f, 0.0f);
+    glColor3f(0.0f, 0.0f, 0.0f);
     glutSolidCube(s);
 
     //glutSolidCone(s);

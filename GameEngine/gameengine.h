@@ -21,6 +21,7 @@
 #include "objects/object.h"
 #include "objects/npc.h"
 #include "ai/gridnode.h"
+#include "objects/skybox.h"
 
 #include "ai/ainpc.h"
 
