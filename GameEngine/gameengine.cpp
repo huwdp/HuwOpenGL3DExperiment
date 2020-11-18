@@ -273,16 +273,15 @@ void GameEngine::setupMap()
     objects.push_back(std::make_shared<TexturedCube>(-20.0f ,1.0f, 0.0f, 0.3f, 10.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
 
     // Objects
-    objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
-    objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
-    objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
-    objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, -10.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<Cube>(-10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<Cube>(10.0f ,1.0f, 10.0f, 2.0f, 0.f, 0.f, 1.f));
+    //objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
 
     // NPCs
     npcs.push_back(std::make_shared<EnemyNPC>("Troll", 10.0f ,0.5f, 10.0f));
@@ -432,8 +431,9 @@ void GameEngine::ai()
     for (auto it = npcs.begin(); it != npcs.end(); ++it)
     {
         auto npc = (*it);
-        if (x > npc->x - 5 && x < npc->x+5
-                && npc->z > npc->z - 5 && npc->z < npc->z+5)
+        int squareArea = 10;
+        if (x > npc->x - squareArea && x < npc->x+squareArea
+                && z > npc->z - squareArea && z < npc->z+squareArea)
         {
             npc->onAlert = true;
             int xx = x3DOpenGLGridTo2dGrid(x);

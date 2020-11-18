@@ -15,6 +15,7 @@ SOURCES += \
     GameEngine/objects/floor.cpp \
     GameEngine/objects/npc.cpp \
     GameEngine/objects/object.cpp \
+    GameEngine/objects/skybox.cpp \
     GameEngine/objects/sphere.cpp \
     GameEngine/objects/texturedcube.cpp \
     GameEngine/texture.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     GameEngine/objects/floor.h \
     GameEngine/objects/npc.h \
     GameEngine/objects/object.h \
+    GameEngine/objects/skybox.h \
     GameEngine/objects/sphere.h \
     GameEngine/objects/texturedcube.h \
     GameEngine/player.h \
