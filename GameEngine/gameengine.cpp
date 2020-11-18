@@ -112,6 +112,9 @@ void GameEngine::init()
     // Enable the light
     glEnable(GL_LIGHT0);
     glEnable(GL_TEXTURE_2D);
+
+    time = glutGet(GLUT_ELAPSED_TIME);
+    fpsDisplay = false;
 }
 
 void GameEngine::reshape(int w, int h)
@@ -168,10 +171,11 @@ void GameEngine::draw()
     // Reset transformations
     glLoadIdentity();
 
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     if (mainMenuToggle)
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
         gluLookAt(0, 1.0f, 10, 0, 1.0f,  5, 0.0f, 1.5f,  0.0f);
 
         int xx = 0;
@@ -194,9 +198,14 @@ void GameEngine::draw()
         glutPostRedisplay();
         return;
     }
-    glClearColor(0.f, 0.f, 0.f, 0.f);
 
+    glPushMatrix();
+    glLoadIdentity();
+    gluLookAt(0, 1.0f, 10, 0, 1.0f,  5, 0.0f, 1.5f,  0.0f);
+    renderFPS();
+    glPopMatrix();
 
+    //glClearColor(0.f, 0.f, 0.f, 0.f);
 
     // Set the camera
     gluLookAt(x, y, z, x+lx, y,  z+lz, 0.0f, 1.5f,  0.0f);
@@ -617,6 +626,9 @@ void GameEngine::processNormalKeys(unsigned char key, int xx, int yy)
                 jump = true;
             }
         break;
+        case 'f':
+            fpsDisplay = !fpsDisplay;
+        break;
     }
 }
 
@@ -835,6 +847,24 @@ float GameEngine::y2DGridTo3DOpenGLGrid(int y)
     return mostTop+y*gridBlockHeight;
 }
 
+void GameEngine::renderFPS()
+{
+    if (fpsDisplay)
+    {
+        float fps = 0.0f;
+        frame++;
+        time=glutGet(GLUT_ELAPSED_TIME);
+
+        if (time - timebase > 1000) {
+            fps = frame*1000.0/(time-timebase);
+            sprintf(fpsText,"FPS: %4.2f",fps);
+            timebase = time;
+            frame = 0;
+        }
+        renderBitmapString(0, 0, 0, GLUT_BITMAP_9_BY_15, fpsText);
+    }
+}
+
 bool GameEngine::loop = true;
 SDL_GLContext GameEngine::ctx;
 SDL_Window* GameEngine::window;
@@ -880,3 +910,9 @@ float GameEngine::mapWidth;
 float GameEngine::mapHeight;
 float GameEngine::gridBlockWidth = 1;
 float GameEngine::gridBlockHeight = 1;
+
+bool GameEngine::fpsDisplay = false;
+int GameEngine::frame = 0;
+int GameEngine::time = 0;
+int GameEngine::timebase = 0;
+char GameEngine::fpsText[50];

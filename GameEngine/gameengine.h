@@ -73,6 +73,13 @@ public:
 
     static bool loop;
 
+    static bool fpsDisplay;
+    static char fpsText[50];
+    static int frame;
+    static int time;
+    static int timebase;
+    static void renderFPS();
+
     // Map Data
     static float mostTop;
     static float mostBottom;
