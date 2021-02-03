@@ -1,0 +1,7 @@
+/*
+0 = IDLE10SEC
+1 = ATTACK
+2 = FLEE
+3 = PATROL
+4 = ALERT
+*/

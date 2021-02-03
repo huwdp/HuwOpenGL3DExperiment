@@ -5,9 +5,9 @@ CONFIG -= qt
 LIBS += -lGL -lSDL2 -std=c++11 -lGLU -lGL -lGLU -lglut
 
 SOURCES += \
-    GameEngine/ai/characterai.cpp \
+    GameEngine/ai/airunner.cpp \
+    GameEngine/ai/aistateobj.cpp \
     GameEngine/ai/enemynpc.cpp \
-    GameEngine/ai/friendlynpc.cpp \
     GameEngine/ai/gridnode.cpp \
     GameEngine/ai/pathfinder.cpp \
     GameEngine/objects/cone.cpp \
@@ -20,16 +20,14 @@ SOURCES += \
     GameEngine/objects/texturedcube.cpp \
     GameEngine/texture.cpp \
         main.cpp \
-    GameEngine/gameengine.cpp \
-    GameEngine/player.cpp \
-    GameEngine/coord.cpp
+    GameEngine/gameengine.cpp
 
 HEADERS += \
-    GameEngine/ai/Enums.h \
     GameEngine/ai/ainpc.h \
-    GameEngine/ai/characterai.h \
+    GameEngine/ai/airunner.h \
+    GameEngine/ai/aistateobj.h \
     GameEngine/ai/enemynpc.h \
-    GameEngine/ai/friendlynpc.h \
+    GameEngine/ai/enums.h \
     GameEngine/ai/gridnode.h \
     GameEngine/ai/pathfinder.h \
     GameEngine/gameengine.h \
@@ -41,8 +39,6 @@ HEADERS += \
     GameEngine/objects/skybox.h \
     GameEngine/objects/sphere.h \
     GameEngine/objects/texturedcube.h \
-    GameEngine/player.h \
-    GameEngine/coord.h \
     GameEngine/texture.h \
     defines.h
 

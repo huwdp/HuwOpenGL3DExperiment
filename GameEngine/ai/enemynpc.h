@@ -1,9 +1,10 @@
 #ifndef ENEMYNPC_H
 #define ENEMYNPC_H
 
-#include "ainpc.h"
-
 #include <string>
+#include <stack>
+
+#include "ainpc.h"
 
 class EnemyNPC : public AINPC
 {

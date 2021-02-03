@@ -18,6 +18,7 @@ private:
 public:
     NPC(float x, float y, float z, float s, float r, float g, float b);
     void draw();
+    bool onAlert = false;
 };
 
 #endif // NPC_H

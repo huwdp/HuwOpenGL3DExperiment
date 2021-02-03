@@ -13,7 +13,6 @@
 #include <algorithm>
 
 #include "gameengine.h"
-#include "player.h"
 #include "objects/cube.h"
 #include "objects/texturedcube.h"
 #include "objects/floor.h"
@@ -24,6 +23,8 @@
 #include "ai/enemynpc.h"
 
 #include "ai/pathfinder.h"
+
+#include "ai/airunner.h"
 
 void GameEngine::init()
 {
@@ -474,6 +475,8 @@ void GameEngine::ai()
             npc->onAlert = false;
         }
     }
+
+    AIRunner::runAI(npcs);
 }
 
 void GameEngine::setupMainMenu()

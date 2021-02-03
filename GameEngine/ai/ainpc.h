@@ -2,8 +2,10 @@
 #define AINPC_H
 
 #include <string>
-
-#include "Enums.h"
+#include <stack>
+#include <memory>
+#include <ctime>
+#include "aistateobj.h"
 
 class AINPC
 {
@@ -14,8 +16,8 @@ public:
     float y;
     float z;
     bool onAlert = false;
-    bool friendly = true;
-    AIState state = AIState::IDLE;
+    std::stack<std::shared_ptr<AIStateObj>> stateStack;
+    std::time_t lastTimeHealed;
     AINPC(std::string name, float x, float y, float z)
     {
         this->name = name;
@@ -23,8 +25,6 @@ public:
         this->y = y;
         this->z = z;
     }
-    //void moveTo(int x, int y) = 0;
-    //void follow(std::shared<NPC> npc) = 0;
     virtual void draw() = 0;
 };
 
