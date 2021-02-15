@@ -26,6 +26,8 @@
 
 #include "ai/airunner.h"
 
+#include "commandrunner.h"
+
 void GameEngine::init()
 {
     loop = true;
@@ -200,10 +202,12 @@ void GameEngine::draw()
         return;
     }
 
+
     glPushMatrix();
     glLoadIdentity();
     gluLookAt(0, 1.0f, 10, 0, 1.0f,  5, 0.0f, 1.5f,  0.0f);
-    renderFPS();
+    //renderFPS();
+    renderCommandRunner();
     glPopMatrix();
 
     //glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -283,8 +287,8 @@ void GameEngine::setupMap()
     objects.push_back(std::make_shared<TexturedCube>(-20.0f ,1.0f, 0.0f, 0.3f, 10.0f, 3.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
 
     // Objects
-    //objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
-    //objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
+    objects.push_back(std::make_shared<TexturedCube>(0.0f ,2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wood"]));
+    objects.push_back(std::make_shared<Cube>(10.0f ,0.2f, 2.0f, 1.0f, 1.f, 0.f, 0.f));
     //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 6.0f, 1.0f, 0.f, 1.f, 0.f));
     //objects.push_back(std::make_shared<Cube>(10.0f ,0.4f, 16.0f, 2.0f, 0.f, 0.f, 1.f));
     //objects.push_back(std::make_shared<TexturedCube>(-10.0f ,1.0f, -10.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f, 1.f, textures["wallpaper"]));
@@ -294,8 +298,8 @@ void GameEngine::setupMap()
     //objects.push_back(std::make_shared<Cube>(0.0f ,0.0f, 0.0f, 2.0f, 0.f, 0.f, 1.f));
 
     // NPCs
-    npcs.push_back(std::make_shared<EnemyNPC>("Troll", 10.0f ,0.5f, 10.0f));
-    npcs.push_back(std::make_shared<EnemyNPC>("Troll", 20.0f ,0.5f, -10.0f));
+    npcs.push_back(std::make_shared<EnemyNPC>("Dave", 10.0f ,0.5f, 10.0f));
+    npcs.push_back(std::make_shared<EnemyNPC>("Bob", 20.0f ,0.5f, -10.0f));
 }
 
 void GameEngine::setupPlayer()
@@ -476,7 +480,7 @@ void GameEngine::ai()
         }
     }
 
-    AIRunner::runAI(npcs);
+    AIRunner::runAI(npcs, grid, x, z);
 }
 
 void GameEngine::setupMainMenu()
@@ -613,11 +617,46 @@ void GameEngine::processNormalKeys(unsigned char key, int xx, int yy)
         }
         return;
     }
+
+    if (commandToggle)
+    {
+        if (key == 8) // Backspace
+        {
+            if (commandText.size() > 0)
+            {
+                commandText.pop_back();
+            }
+        }
+        else if (key == '`')
+        {
+            commandToggle = false;
+            commandText = "";
+        }
+        else if (key == 13) // ENTER
+        {
+            CommandRunner::runCommand(commandText, npcs, grid);
+            commandToggle = false;
+            commandText = "";
+        }
+        else
+        {
+            commandText.push_back((char)key);
+        }
+        return;
+    }
+
     switch (key) {
         case 27:    // Esc
             mainMenuToggle = true;
             break;
     }
+
+    switch (key) {
+        case '`':
+            commandToggle = true;
+            break;
+    }
+
     switch (key) {
         case 'w' : deltaMove = forwardMovementSpeed; break;
         case 'a' : deltaAngle = -leftRightMovementSpeed; break;
@@ -868,6 +907,15 @@ void GameEngine::renderFPS()
     }
 }
 
+void GameEngine::renderCommandRunner()
+{
+    if (commandToggle)
+    {
+        renderBitmapString(0, 0, 0, GLUT_BITMAP_9_BY_15, (char*)commandText.c_str());
+    }
+}
+
+
 bool GameEngine::loop = true;
 SDL_GLContext GameEngine::ctx;
 SDL_Window* GameEngine::window;
@@ -900,6 +948,9 @@ std::unordered_map<std::string, std::shared_ptr<Texture>> GameEngine::textures;
 std::vector<std::string> GameEngine::mainMenu;
 bool GameEngine::mainMenuToggle;
 int GameEngine::mainMenuSelectedItem;
+
+bool GameEngine::commandToggle;
+std::string GameEngine::commandText;
 
 int GameEngine::grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT];
 

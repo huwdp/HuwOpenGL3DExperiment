@@ -47,6 +47,9 @@ public:
     static bool mainMenuToggle;
     static int mainMenuSelectedItem;
 
+    static bool commandToggle;
+    static std::string commandText;
+
     static void checkSDLError(int line = -1);
     static void printSDLGLAttributes();
     static bool setOpenGLAttributes();
@@ -79,6 +82,7 @@ public:
     static int time;
     static int timebase;
     static void renderFPS();
+    static void renderCommandRunner();
 
     // Map Data
     static float mostTop;

@@ -10,6 +10,7 @@ class AIStateObj
 {
 public:
     AIStateObj(int state, std::time_t timestamp, int seconds);
+    AIStateObj(int state, std::time_t timestamp);
     int state;
     std::time_t timestamp;
     int seconds;

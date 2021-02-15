@@ -10,6 +10,7 @@ SOURCES += \
     GameEngine/ai/enemynpc.cpp \
     GameEngine/ai/gridnode.cpp \
     GameEngine/ai/pathfinder.cpp \
+    GameEngine/commandrunner.cpp \
     GameEngine/objects/cone.cpp \
     GameEngine/objects/cube.cpp \
     GameEngine/objects/floor.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     GameEngine/ai/enums.h \
     GameEngine/ai/gridnode.h \
     GameEngine/ai/pathfinder.h \
+    GameEngine/commandrunner.h \
     GameEngine/gameengine.h \
     GameEngine/objects/cone.h \
     GameEngine/objects/cube.h \

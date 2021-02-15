@@ -4,4 +4,5 @@
 2 = FLEE
 3 = PATROL
 4 = ALERT
+5 = MOVE
 */
