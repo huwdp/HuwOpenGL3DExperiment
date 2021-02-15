@@ -1,4 +1,5 @@
 
+
 # OpenGL Glut Museum
 
 This ia a playground for experimenting with OpenGL and 3D rendering.
@@ -10,11 +11,14 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  - ~~Ambient lighting~~
  - ~~Lighting (Phong or Gourand, phong chosen)~~
  - Object loader
- - Map (for objects)
+ - ~~Map (for objects)~~
  - ~~Object collision~~
- - Cubemap
- - Tree
+ - ~~Cubemap~~
  - ~~Basic 3D collision~~
+  - ~~Pathfinding~~
+ - ~~WASD~~
+ ~~Main menu~~
+ - AI **(in progress)**
  - Picture frames
  - Software Culling
  - Game intro
@@ -22,11 +26,9 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  - Mechanics
  - Fun
  - Better texture format
- - AI
- - ~~Pathfinding~~
- - ~~WASD~~
+ - Tree
  - Mouse control
- ~~Main menu~~
+
 
 ## Dependencies
 
