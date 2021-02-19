@@ -19,6 +19,7 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  - ~~WASD~~
  ~~Main menu~~
  - AI **(in progress)**
+ - OpenGL push/pop
  - Picture frames
  - Software Culling
  - Game intro
