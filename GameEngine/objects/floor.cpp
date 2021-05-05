@@ -11,6 +11,7 @@ Floor::Floor(float x, float y, float z, float w, float l, float h, float r, floa
 
 void Floor::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
 
     glEnable(GL_TEXTURE_2D);
@@ -40,5 +41,5 @@ void Floor::draw()
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

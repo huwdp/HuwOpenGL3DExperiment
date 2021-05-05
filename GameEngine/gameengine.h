@@ -20,7 +20,7 @@
 
 #include "objects/object.h"
 #include "objects/npc.h"
-#include "ai/gridnode.h"
+#include "coord2d.h"
 #include "objects/skybox.h"
 
 #include "ai/ainpc.h"
@@ -112,6 +112,7 @@ public:
     static void setupMapData();
     static void setupNpcs();
     static void setupMainMenu();
+    static void checkerBoardGrid();
 
     // Pathfinding
     static void setupGrid();

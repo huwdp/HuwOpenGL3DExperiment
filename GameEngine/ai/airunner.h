@@ -5,6 +5,7 @@
 #include <memory>
 #include "ainpc.h"
 #include "defines.h"
+#include "../objects/object.h"
 
 class AIRunner
 {
@@ -14,7 +15,7 @@ private:
 public:
     AIRunner();
     static void popOffStackIfPossible(std::shared_ptr<AINPC> npc);
-    static void runAI(std::vector<std::shared_ptr<AINPC>> npcs,
+    static void runAI(std::vector<std::shared_ptr<AINPC>> npcs, std::vector<std::shared_ptr<Object>> objects,
                          int grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT],
                          float playerX,
                          float playerY);

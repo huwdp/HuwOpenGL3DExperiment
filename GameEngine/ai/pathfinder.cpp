@@ -4,10 +4,10 @@
 #include <queue>
 #include "defines.h"
 
-std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT], int startX, int startY, int endX, int endY)
+std::vector<std::shared_ptr<Coord2D>> Pathfinder::generatePath(int grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT], int startX, int startY, int endX, int endY)
 {
-    std::vector<std::shared_ptr<GridNode>> path;
-    std::vector<std::shared_ptr<GridNode>> emptyPath;
+    std::vector<std::shared_ptr<Coord2D>> path;
+    std::vector<std::shared_ptr<Coord2D>> emptyPath;
 
     // Optimisation - If user is outside of the map
     // then don't bother to run pathfinding
@@ -37,13 +37,13 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
     int count = 0;
     int cost = 0;
     bool found = false;
-    std::queue<std::shared_ptr<GridNode>> gridQueue;  // Convert to priority queue for better performance
-    gridQueue.push(std::make_shared<GridNode>(startX, startY));
+    std::queue<std::shared_ptr<Coord2D>> gridQueue;  // Convert to priority queue for better performance
+    gridQueue.push(std::make_shared<Coord2D>(startX, startY));
     pathfindingGrid[startX][startY] = cost;
 
     while (!gridQueue.empty() && !found && count < MAX_LIMIT)
     {
-        std::shared_ptr<GridNode> node2 = gridQueue.front();
+        std::shared_ptr<Coord2D> node2 = gridQueue.front();
         if (node2->x == endX && node2->y == endY)
         {
             found = true;
@@ -52,7 +52,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
 
         cost++;
 
-        std::queue<std::shared_ptr<GridNode>> neighbourQueue;
+        std::queue<std::shared_ptr<Coord2D>> neighbourQueue;
 
         while (!gridQueue.empty())
         {
@@ -62,7 +62,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
 
         while (!neighbourQueue.empty() && !found && count < MAX_LIMIT)
         {
-            std::shared_ptr<GridNode> node = neighbourQueue.front();
+            std::shared_ptr<Coord2D> node = neighbourQueue.front();
 
             if (node->x == endX && node->y == endY)
             {
@@ -79,7 +79,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
                 if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
                 {
                     pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
+                    neighbourQueue.push(std::make_shared<Coord2D>(xx, yy));
                 }
             }
 
@@ -90,7 +90,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
                 if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
                 {
                     pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
+                    neighbourQueue.push(std::make_shared<Coord2D>(xx, yy));
                 }
             }
 
@@ -101,7 +101,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
                 if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
                 {
                     pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
+                    neighbourQueue.push(std::make_shared<Coord2D>(xx, yy));
                 }
             }
 
@@ -112,7 +112,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
                 if (pathfindingGrid[xx][yy] == -1 && grid[xx][yy] == 0)
                 {
                     pathfindingGrid[xx][yy] = cost;
-                    neighbourQueue.push(std::make_shared<GridNode>(xx, yy));
+                    neighbourQueue.push(std::make_shared<Coord2D>(xx, yy));
                 }
             }
 
@@ -152,7 +152,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
     }
 
     pathfindingGrid[endX][endY] = cost++;
-    path.push_back(std::make_shared<GridNode>(endX,endY));
+    path.push_back(std::make_shared<Coord2D>(endX,endY));
 
     int bestXGNode = endX;
     int bestYGNode = endY;
@@ -223,7 +223,7 @@ std::vector<std::shared_ptr<GridNode>> Pathfinder::generatePath(int grid[GRID_MA
             return emptyPath;
         }
 
-        path.push_back(std::make_shared<GridNode>(bestXGNode,bestYGNode));
+        path.push_back(std::make_shared<Coord2D>(bestXGNode,bestYGNode));
         ++count;
     }
     std::reverse(std::begin(path), std::end(path));

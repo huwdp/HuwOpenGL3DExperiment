@@ -60,7 +60,7 @@ void CommandRunner::runCommand(std::string command,
 
             std::reverse(std::begin(path), std::end(path));
 
-            for (std::vector<std::shared_ptr<GridNode>>::iterator it = path.begin(); it != path.end(); ++it)
+            for (std::vector<std::shared_ptr<Coord2D>>::iterator it = path.begin(); it != path.end(); ++it)
             {
                 npc->pathStack.push((*it));
             }
@@ -124,6 +124,13 @@ void CommandRunner::runCommand(std::string command,
         if (npc != nullptr)
         {
             npc->popStack();
+
+            // Also wipe path
+            while (!npc->pathStack.empty())
+            {
+                npc->pathStack.pop();
+            }
+
             std::cout << "Popped state off object with name of \"" << npc->name << "\"" << std::endl;
         }
         else

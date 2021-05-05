@@ -16,6 +16,7 @@ TexturedCube::TexturedCube(float x, float y, float z, float w, float l, float h,
 
 void TexturedCube::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
 
 
@@ -88,5 +89,5 @@ void TexturedCube::draw()
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

@@ -1,7 +1,7 @@
 #include "airunner.h"
 
 #include "enums.h"
-#include "gridnode.h"
+#include "../coord2d.h"
 #include "GameEngine/gameengine.h"
 #include "pathfinder.h"
 #include <algorithm>
@@ -14,6 +14,7 @@ AIRunner::AIRunner()
 }
 
 void AIRunner::runAI(std::vector<std::shared_ptr<AINPC>> npcs,
+                     std::vector<std::shared_ptr<Object>> objects,
                      int grid[GRID_MAP_WIDTH][GRID_MAP_HEIGHT],
                      float playerX,
                      float playerY)
@@ -65,7 +66,7 @@ void AIRunner::runAI(std::vector<std::shared_ptr<AINPC>> npcs,
 
                 std::reverse(std::begin(path), std::end(path));
 
-                for (std::vector<std::shared_ptr<GridNode>>::iterator it = path.begin(); it != path.end(); ++it)
+                for (std::vector<std::shared_ptr<Coord2D>>::iterator it = path.begin(); it != path.end(); ++it)
                 {
                     npc->pathStack.push((*it));
                 }
@@ -81,6 +82,77 @@ void AIRunner::runAI(std::vector<std::shared_ptr<AINPC>> npcs,
             // Find a place to hide and take cover
             // TODO
             npc->popStack();
+
+
+
+
+
+            bool isPlayerFacingNorth = false;
+            bool isPlayerFacingWest = false;
+            std::vector<std::shared_ptr<Object>> objectsToHideBehind;
+            for (auto it = objects.begin(); it != objects.end(); ++it)
+            {
+                std::shared_ptr<Object> obj = (*it);
+                // Things to check
+
+                // Add obj to list if it's in front of player and obj is high enough to cover npc
+
+                // Add obj to list if it's in behind player
+
+
+                if (isPlayerFacingNorth && obj->x < playerX)
+                {
+                    if (obj->height > 1) // Replace 1 with npc height
+                    {
+                        objectsToHideBehind.push_back(obj);
+                    }
+                }
+                if (!isPlayerFacingNorth && obj->x > playerX)
+                {
+                    objectsToHideBehind.push_back(obj);
+                }
+
+                if (isPlayerFacingWest && obj->y < playerY)
+                {
+                    if (obj->height > 1) // Replace 1 with npc height
+                    {
+                        objectsToHideBehind.push_back(obj);
+                    }
+                }
+                if (!isPlayerFacingWest && obj->y > playerY)
+                {
+                    objectsToHideBehind.push_back(obj);
+                }
+            }
+
+            /*
+            // Choose best or random object to hide NPC behind
+            if (objectsToHideBehind.size() > 0)
+            {
+                auto destination = objectsToHideBehind.front();
+
+                int xSide = 1;
+                int ySide = 1;
+
+                if (isPlayerFacingNorth)
+                {
+                    xSide = -1;
+                }
+                if (isPlayerFacingWest)
+                {
+                    ySide = -1;
+                }
+
+                auto path = Pathfinder::generatePath(grid,
+                                         GameEngine::x3DOpenGLGridTo2dGrid(npc->x),
+                                         GameEngine::y3DOpenGLGridTo2dGrid(npc->z),
+                                         GameEngine::x3DOpenGLGridTo2dGrid(destination->x)+1,
+                                         GameEngine::y3DOpenGLGridTo2dGrid(destination->y)+1);
+
+                std::reverse(std::begin(path), std::end(path));
+                npc->destGridX = xx;
+                npc->destGridY = yy;
+            }*/
         }
         else if (currentState->state == 3) // PARTOL
         {
@@ -132,7 +204,7 @@ void AIRunner::runAI(std::vector<std::shared_ptr<AINPC>> npcs,
                 npc->destGridX = xx;
                 npc->destGridY = yy;
 
-                for (std::vector<std::shared_ptr<GridNode>>::iterator it = path.begin(); it != path.end(); ++it)
+                for (std::vector<std::shared_ptr<Coord2D>>::iterator it = path.begin(); it != path.end(); ++it)
                 {
                     npc->pathStack.push((*it));
                 }

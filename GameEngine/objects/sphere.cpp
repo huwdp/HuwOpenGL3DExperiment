@@ -11,6 +11,7 @@ Sphere::Sphere(float x, float y, float z, float s, float r, float g, float b)
 
 void Sphere::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
     if (collision)
     {
@@ -21,5 +22,5 @@ void Sphere::draw()
         glColor3f(r, g, b);
     }
     glutSolidCone(s, 2, 2, 2);
-    glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

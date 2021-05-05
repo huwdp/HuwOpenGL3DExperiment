@@ -16,6 +16,7 @@ SkyBox::SkyBox(float x, float y, float z, float w, float l, float h, float r, fl
 
 void SkyBox::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
 
 
@@ -88,5 +89,5 @@ void SkyBox::draw()
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

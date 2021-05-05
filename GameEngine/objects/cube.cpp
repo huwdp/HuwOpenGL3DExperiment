@@ -12,6 +12,7 @@ Cube::Cube(float x, float y, float z, float s, float r, float g, float b)
 
 void Cube::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
     if (collision)
     {
@@ -22,5 +23,5 @@ void Cube::draw()
         glColor3f(r, g, b);
     }
     glutSolidCube(s);
-    glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

@@ -11,6 +11,7 @@ Cone::Cone(float x, float y, float z, float s, float r, float g, float b)
 
 void Cone::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
     if (collision)
     {
@@ -21,5 +22,5 @@ void Cone::draw()
         glColor3f(r, g, b);
     }
     glutSolidCone(s, 2, 2, 2);
-    glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

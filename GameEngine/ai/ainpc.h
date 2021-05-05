@@ -6,7 +6,7 @@
 #include <memory>
 #include <ctime>
 #include "aistateobj.h"
-#include "gridnode.h"
+#include "../coord2d.h"
 
 class AINPC
 {
@@ -15,7 +15,7 @@ protected:
     std::stack<std::shared_ptr<AIStateObj>> stateStack;
 public:
     std::time_t lastMoved;
-    std::stack<std::shared_ptr<GridNode>> pathStack;
+    std::stack<std::shared_ptr<Coord2D>> pathStack;
 
     int id;
     std::string name;

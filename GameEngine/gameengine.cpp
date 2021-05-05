@@ -18,7 +18,7 @@
 #include "objects/floor.h"
 #include "objects/skybox.h"
 
-#include "ai/gridnode.h"
+#include "coord2d.h"
 
 #include "ai/enemynpc.h"
 
@@ -27,6 +27,8 @@
 #include "ai/airunner.h"
 
 #include "commandrunner.h"
+
+#include "objectloader.h"
 
 void GameEngine::init()
 {
@@ -272,6 +274,13 @@ bool GameEngine::assets()
 
 void GameEngine::setupMap()
 {
+    auto object = ObjectLoader::loadObject("objects/torus.obj");
+    if (object != nullptr)
+    {
+        // Set x,y,z
+        objects.push_back(object);
+    }
+
     // Floor
     objects.push_back(std::make_shared<Floor>(0.0f ,-1.0f, 0.0f, 30.0f, 0.1f, 30.0f, 0.f, 0.f, 0.f, textures["wood"]));
 
@@ -300,6 +309,8 @@ void GameEngine::setupMap()
     // NPCs
     npcs.push_back(std::make_shared<EnemyNPC>("Dave", 10.0f ,0.5f, 10.0f));
     npcs.push_back(std::make_shared<EnemyNPC>("Bob", 20.0f ,0.5f, -10.0f));
+
+
 }
 
 void GameEngine::setupPlayer()
@@ -422,8 +433,30 @@ void GameEngine::setupGrid()
         {
             if (grid[i][j] == 1)
             {
-                //gridCollisionFloor.push_back(std::make_shared<Floor>(mostLeft+i*gridBlockWidth ,-0.9f, mostTop+j*gridBlockHeight, gridBlockWidth/2, gridBlockHeight/2, 0.1f, 0.f, 1.f, 0.f, textures["wallpaper"]));
-                gridCollisionFloor.push_back(std::make_shared<Floor>(x2DGridTo3DOpenGLGrid(i),
+                /*gridCollisionFloor.push_back(std::make_shared<Floor>(x2DGridTo3DOpenGLGrid(i),
+                                                                     -0.9f,
+                                                                     y2DGridTo3DOpenGLGrid(j),
+                                                                     gridBlockWidth/2,
+                                                                     0.1f,
+                                                                     gridBlockHeight/2,
+                                                                     0.f,
+                                                                     1.f,
+                                                                     0.f,
+                                                                     textures["wallpaper"]));*/
+            }
+        }
+    }
+}
+
+void GameEngine::checkerBoardGrid()
+{
+    for (int i = 0; i < GRID_MAP_WIDTH; ++i)
+    {
+        for (int j = 0; j < GRID_MAP_HEIGHT; ++j)
+        {
+            if (i % 2 == 0 || j % 2 == 0)
+            {
+                objects.push_back(std::make_shared<Floor>(x2DGridTo3DOpenGLGrid(i),
                                                                      -0.9f,
                                                                      y2DGridTo3DOpenGLGrid(j),
                                                                      gridBlockWidth/2,
@@ -456,11 +489,11 @@ void GameEngine::ai()
             int npcX = x3DOpenGLGridTo2dGrid(npc->x);
             int npcZ = y3DOpenGLGridTo2dGrid(npc->z);
 
-            std::vector<std::shared_ptr<GridNode>> path = Pathfinder::generatePath(grid, npcX, npcZ, xx, yy);
+            std::vector<std::shared_ptr<Coord2D>> path = Pathfinder::generatePath(grid, npcX, npcZ, xx, yy);
 
             for (auto it = path.begin(); it != path.end(); ++it)
             {
-                std::shared_ptr<GridNode> gNode = (*it);
+                std::shared_ptr<Coord2D> gNode = (*it);
                 int bob = x2DGridTo3DOpenGLGrid(gNode->x);
                 pathfinderPaths.push_back(std::make_shared<Floor>(bob,
                                                                   -0.9f,
@@ -480,7 +513,7 @@ void GameEngine::ai()
         }
     }
 
-    AIRunner::runAI(npcs, grid, x, z);
+    AIRunner::runAI(npcs, objects, grid, x, z);
 }
 
 void GameEngine::setupMainMenu()

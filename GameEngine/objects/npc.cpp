@@ -11,6 +11,7 @@ NPC::NPC(float x, float y, float z, float s, float r, float g, float b)
 
 void NPC::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
 
     float width = 1;
@@ -19,6 +20,5 @@ void NPC::draw()
     glColor3f(0.0f, 0.0f, 0.0f);
     glutSolidCube(s);
 
-    //glutSolidCone(s);
-    glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

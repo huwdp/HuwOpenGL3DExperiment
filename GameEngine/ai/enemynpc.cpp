@@ -10,6 +10,7 @@ EnemyNPC::EnemyNPC(std::string name, float x, float y, float z)
 
 void EnemyNPC::draw()
 {
+    glPushMatrix();
     glTranslatef(x, y, z);
     if (onAlert)
     {
@@ -21,4 +22,5 @@ void EnemyNPC::draw()
     }
     glutSolidCube(2);
     glTranslatef(-x, -y, -z);
+    glPopMatrix();
 }

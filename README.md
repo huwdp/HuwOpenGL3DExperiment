@@ -1,19 +1,19 @@
 
-# OpenGL Glut Museum
+# OpenGL 3D experiment
 
 This ia a playground for experimenting with OpenGL and 3D rendering.
 
 # Todo
- - Better movement
+ - ~~Better movement~~
  - ~~Textures~~
  - ~~Diffuse lighting~~
  - ~~Ambient lighting~~
  - ~~Lighting (Phong or Gourand, phong chosen)~~
- - Object loader
+ - Object loader **(in progress)**
  - Map (for objects)
  - ~~Object collision~~
- - Cubemap
- - Tree
+ - Cubemap/plants
+ - Trees
  - ~~Basic 3D collision~~
  - Picture frames
  - Software Culling
@@ -29,7 +29,6 @@ This ia a playground for experimenting with OpenGL and 3D rendering.
  ~~Main menu~~
 
 ## Dependencies
-
  - SDL 2
  - FreeGlut 3
 
