@@ -41,9 +41,9 @@ Press ``` ` ``` to open command editor. Currently we have "Bob" and "Dave" NPCs 
  - ~~WASD~~
  ~~Main menu~~
  - AI **(in progress)**
- - OpenGL push/pop
- -  Better movement
- -  Object loader
+ -  ~~OpenGL push/pop ~~
+ -   ~~Better movement ~~
+ -  Object loader **(in progress)**
  - Picture frames
  - Software Culling
  - Game intro
